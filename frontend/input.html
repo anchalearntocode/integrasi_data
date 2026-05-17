@@ -15,6 +15,10 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
                 Dashboard
             </a>
+            <a href="data.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Data Alumni
+            </a>
             <a href="input.html" class="nav-link active">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 Input Data
@@ -37,42 +41,63 @@
                 <div id="form-alert" class="alert"></div>
                 
                 <form id="form-alumni">
-                    <!-- ID Responden is auto-increment -->
-                    <div class="form-group">
-                        <label class="form-label">ID Responden</label>
-                        <input type="text" class="form-control" value="Auto Generated (misal: ALM-001)" disabled style="opacity: 0.7;">
-                        <small style="color: var(--text-secondary); font-size: 12px; margin-top: 4px; display: block;">ID akan dibuat secara otomatis secara berurutan.</small>
-                    </div>
-
                     <div class="two-col-grid">
+                        <div class="form-group">
+                            <label class="form-label">Kode Responden Asli</label>
+                            <input type="text" id="kode_responden_asli" class="form-control" placeholder="Contoh: R-001" required>
+                        </div>
+                        
                         <div class="form-group">
                             <label class="form-label">Tahun Lulus</label>
                             <input type="number" id="tahun_lulus" class="form-control" placeholder="Contoh: 2024" required>
                         </div>
+                    </div>
+
+                    <div class="two-col-grid">
+                        <div class="form-group">
+                            <label class="form-label">Program Studi</label>
+                            <input type="text" id="nama_prodi" class="form-control" placeholder="Contoh: Teknik Mesin" required>
+                        </div>
                         
                         <div class="form-group">
-                            <label class="form-label">TMJ</label>
-                            <input type="text" id="tmj" class="form-control" placeholder="Contoh: TMJ" value="TMJ" required>
+                            <label class="form-label">Jenjang</label>
+                            <select id="jenjang" class="form-control" required>
+                                <option value="" disabled selected>Pilih Jenjang</option>
+                                <option value="D3">D3</option>
+                                <option value="D4">D4</option>
+                                <option value="S1">S1</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="two-col-grid">
+                        <div class="form-group">
+                            <label class="form-label">Jurusan</label>
+                            <input type="text" id="jurusan" class="form-control" placeholder="Contoh: Teknik Mesin" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Status Kerja</label>
+                            <select id="status_kerja" class="form-control" required>
+                                <option value="" disabled selected>Pilih Status Kerja</option>
+                                <option value="Bekerja (Full Time)">Bekerja (Full Time)</option>
+                                <option value="Bekerja (Part Time)">Bekerja (Part Time)</option>
+                                <option value="Wiraswasta">Wiraswasta</option>
+                                <option value="Melanjutkan Pendidikan">Melanjutkan Pendidikan</option>
+                                <option value="Belum Bekerja">Belum Bekerja</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="two-col-grid">
                         <div class="form-group">
-                            <label class="form-label">Waktu Tunggu</label>
-                            <select id="waktu_tunggu" class="form-control" required>
-                                <option value="" disabled selected>Pilih Waktu Tunggu</option>
-                                <option value="< 1 bulan">&lt; 1 bulan</option>
-                                <option value="1-3 bulan">1-3 bulan</option>
-                                <option value="3-6 bulan">3-6 bulan</option>
-                                <option value="6-12 bulan">6-12 bulan</option>
-                                <option value="> 12 bulan">&gt; 12 bulan</option>
-                                <option value="-">- (Belum Bekerja)</option>
-                            </select>
+                            <label class="form-label">Jenis Pekerjaan</label>
+                            <input type="text" id="jenis_pekerjaan" class="form-control" placeholder="Contoh: Engineer, Staf IT, dll">
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Kategori Perusahaan</label>
-                            <input type="text" id="kategori_perusahaan" class="form-control" placeholder="Contoh: Bank BUMN (BRI), Perusahaan Swasta..." required>
+                            <label class="form-label">Kategori Instansi/Perusahaan</label>
+                            <input type="text" id="kategori_instansi" class="form-control" placeholder="Contoh: Swasta, BUMN..." required>
                         </div>
                     </div>
 
@@ -83,8 +108,8 @@
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Pendapatan</label>
-                            <select id="pendapatan" class="form-control" required>
+                            <label class="form-label">Range Pendapatan</label>
+                            <select id="range_pendapatan" class="form-control" required>
                                 <option value="" disabled selected>Pilih Pendapatan</option>
                                 <option value="< Rp 2 Juta">&lt; Rp 2 Juta</option>
                                 <option value="Rp 2-3 Juta">Rp 2-3 Juta</option>
@@ -98,13 +123,13 @@
 
                     <div class="two-col-grid">
                         <div class="form-group">
-                            <label class="form-label">Lama Cari Kerja (Bulan)</label>
-                            <input type="number" id="lama_cari_kerja" class="form-control" placeholder="Contoh: 2" required>
+                            <label class="form-label">Lama Tunggu (Bulan)</label>
+                            <input type="number" id="lama_tunggu_bulan" class="form-control" placeholder="Contoh: 2" required>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">Lokasi Kerja</label>
-                            <input type="text" id="lokasi_kerja" class="form-control" placeholder="Contoh: Luar Kota (Sulawesi), Dalam Kota..." required>
+                            <label class="form-label">Kota / Lokasi Kerja</label>
+                            <input type="text" id="nama_kota" class="form-control" placeholder="Contoh: Jakarta, Makassar..." required>
                         </div>
                     </div>
 
@@ -114,7 +139,7 @@
         </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=2"></script>
     <script>
         // Check authentication
         checkAuth();
@@ -128,14 +153,18 @@
             btn.disabled = true;
             
             const data = {
+                kode_responden_asli: document.getElementById('kode_responden_asli').value,
                 tahun_lulus: document.getElementById('tahun_lulus').value,
-                tmj: document.getElementById('tmj').value,
-                waktu_tunggu: document.getElementById('waktu_tunggu').value,
-                kategori_perusahaan: document.getElementById('kategori_perusahaan').value,
-                jenis_lembaga: document.getElementById('jenis_lembaga').value || "-", // Handle empty
-                pendapatan: document.getElementById('pendapatan').value,
-                lama_cari_kerja: document.getElementById('lama_cari_kerja').value,
-                lokasi_kerja: document.getElementById('lokasi_kerja').value
+                nama_prodi: document.getElementById('nama_prodi').value,
+                jenjang: document.getElementById('jenjang').value,
+                jurusan: document.getElementById('jurusan').value,
+                status_kerja: document.getElementById('status_kerja').value,
+                jenis_pekerjaan: document.getElementById('jenis_pekerjaan').value || "-", 
+                kategori_instansi: document.getElementById('kategori_instansi').value,
+                jenis_lembaga: document.getElementById('jenis_lembaga').value || "-",
+                range_pendapatan: document.getElementById('range_pendapatan').value,
+                lama_tunggu_bulan: document.getElementById('lama_tunggu_bulan').value,
+                nama_kota: document.getElementById('nama_kota').value
             };
             
             try {
@@ -152,9 +181,8 @@
                 
                 if (result.status === 'success') {
                     alertEl.className = 'alert alert-success';
-                    alertEl.textContent = `${result.message} (ID: ${result.id_responden})`;
+                    alertEl.textContent = result.message;
                     this.reset();
-                    document.getElementById('tmj').value = "TMJ"; // reset default
                 } else {
                     alertEl.className = 'alert alert-error';
                     alertEl.textContent = result.message;

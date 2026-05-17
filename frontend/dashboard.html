@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alumni Data - Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 16px 0;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+    </style>
 </head>
 <body>
     <div class="layout-wrapper">
@@ -14,6 +36,10 @@
             <a href="dashboard.html" class="nav-link active">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
                 Dashboard
+            </a>
+            <a href="data.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Data Alumni
             </a>
             <a href="input.html" class="nav-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -33,45 +59,52 @@
                 <p class="page-subtitle">Visualisasi Data Lulusan dan Ketenagakerjaan</p>
             </div>
 
+            <!-- Global Stat -->
+            <div class="card glass stat-card" style="margin-bottom: 24px;">
+                <h3 class="card-title">Rata-Rata Waktu Tunggu Global</h3>
+                <div class="stat-value" id="global-waktu-tunggu">...</div>
+                <div class="stat-label">Bulan</div>
+            </div>
+
             <!-- Charts Grid -->
             <div class="grid">
-                <!-- Card 1: Total Alumni Kerja vs Tidak -->
+                <!-- Card 1: Waktu Tunggu per Prodi -->
                 <div class="card glass">
                     <div class="card-header">
-                        <h3 class="card-title">Status Pekerjaan Alumni</h3>
+                        <h3 class="card-title">Rata-rata Waktu Tunggu per Prodi</h3>
                     </div>
-                    <div class="chart-placeholder">
-                        Grafik Status Pekerjaan Akan Tampil Di Sini
+                    <div class="chart-container" style="position: relative; height:300px; width:100%">
+                        <canvas id="chart-waktu-tunggu-prodi"></canvas>
                     </div>
                 </div>
 
-                <!-- Card 2: Waktu Tunggu -->
+                <!-- Card 2: Jumlah Alumni per Prodi -->
                 <div class="card glass">
                     <div class="card-header">
-                        <h3 class="card-title">Waktu Tunggu Mendapatkan Kerja</h3>
+                        <h3 class="card-title">Jumlah Alumni per Prodi</h3>
                     </div>
-                    <div class="chart-placeholder">
-                        Grafik Waktu Tunggu Akan Tampil Di Sini
+                    <div class="chart-container" style="position: relative; height:300px; width:100%">
+                        <canvas id="chart-alumni-prodi"></canvas>
                     </div>
                 </div>
 
-                <!-- Card 3: Kategori Perusahaan -->
-                <div class="card glass">
+                <!-- Card 3: Status Kerja per Prodi -->
+                <div class="card glass" style="grid-column: 1 / -1;">
                     <div class="card-header">
-                        <h3 class="card-title">Kategori Perusahaan Tempat Kerja</h3>
+                        <h3 class="card-title">Perbandingan Status Kerja Alumni per Prodi</h3>
                     </div>
-                    <div class="chart-placeholder">
-                        Grafik Kategori Perusahaan Akan Tampil Di Sini
+                    <div class="chart-container" style="position: relative; height:350px; width:100%">
+                        <canvas id="chart-status-kerja"></canvas>
                     </div>
                 </div>
 
-                <!-- Card 4: Rentang Pendapatan -->
-                <div class="card glass">
+                <!-- Card 4: Serapan Kerja per Tahun Lulus -->
+                <div class="card glass" style="grid-column: 1 / -1;">
                     <div class="card-header">
-                        <h3 class="card-title">Distribusi Pendapatan Alumni</h3>
+                        <h3 class="card-title">Tren Serapan Kerja Berdasarkan Tahun Lulus</h3>
                     </div>
-                    <div class="chart-placeholder">
-                        Grafik Pendapatan Akan Tampil Di Sini
+                    <div class="chart-container" style="position: relative; height:350px; width:100%">
+                        <canvas id="chart-serapan-tahun"></canvas>
                     </div>
                 </div>
             </div>
@@ -105,12 +138,16 @@
         </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=2"></script>
     <script>
         // Check authentication
         checkAuth();
         // Load data for preview table
         loadAlumniData();
+        // Load data for dashboard charts
+        if (typeof loadDashboardCharts === 'function') {
+            loadDashboardCharts();
+        }
     </script>
 </body>
 </html>

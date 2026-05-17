@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo json_encode(["status" => "error", "message" => "Registrasi gagal."]);
                 }
             } catch (PDOException $e) {
-                if ($e->errorInfo[1] == 19) { // SQLite constraint violation (UNIQUE)
+                if ($e->errorInfo[1] == 1062) { // MySQL constraint violation (UNIQUE)
                     echo json_encode(["status" => "error", "message" => "Username sudah digunakan."]);
                 } else {
                     echo json_encode(["status" => "error", "message" => "Error: " . $e->getMessage()]);
