@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Data - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="layout-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar glass">
+            <a href="dashboard.html" class="sidebar-logo">DataAlumni</a>
+            <a href="dashboard.html" class="nav-link active">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+                Dashboard
+            </a>
+            <a href="input.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Input Data
+            </a>
+            
+            <a href="#" class="nav-link nav-logout" onclick="logout()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Logout
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard Overview</h1>
+                <p class="page-subtitle">Visualisasi Data Lulusan dan Ketenagakerjaan</p>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid">
+                <!-- Card 1: Total Alumni Kerja vs Tidak -->
+                <div class="card glass">
+                    <div class="card-header">
+                        <h3 class="card-title">Status Pekerjaan Alumni</h3>
+                    </div>
+                    <div class="chart-placeholder">
+                        Grafik Status Pekerjaan Akan Tampil Di Sini
+                    </div>
+                </div>
+
+                <!-- Card 2: Waktu Tunggu -->
+                <div class="card glass">
+                    <div class="card-header">
+                        <h3 class="card-title">Waktu Tunggu Mendapatkan Kerja</h3>
+                    </div>
+                    <div class="chart-placeholder">
+                        Grafik Waktu Tunggu Akan Tampil Di Sini
+                    </div>
+                </div>
+
+                <!-- Card 3: Kategori Perusahaan -->
+                <div class="card glass">
+                    <div class="card-header">
+                        <h3 class="card-title">Kategori Perusahaan Tempat Kerja</h3>
+                    </div>
+                    <div class="chart-placeholder">
+                        Grafik Kategori Perusahaan Akan Tampil Di Sini
+                    </div>
+                </div>
+
+                <!-- Card 4: Rentang Pendapatan -->
+                <div class="card glass">
+                    <div class="card-header">
+                        <h3 class="card-title">Distribusi Pendapatan Alumni</h3>
+                    </div>
+                    <div class="chart-placeholder">
+                        Grafik Pendapatan Akan Tampil Di Sini
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Table Preview -->
+            <div class="card glass" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3 class="card-title">Data Alumni Terbaru</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">ID Responden</th>
+                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">Tahun Lulus</th>
+                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">Waktu Tunggu</th>
+                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">Perusahaan</th>
+                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">Pendapatan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alumni-table-body">
+                            <!-- Data will be populated here -->
+                            <tr>
+                                <td colspan="5" style="padding: 20px; text-align: center; color: var(--text-secondary);">Memuat data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Check authentication
+        checkAuth();
+        // Load data for preview table
+        loadAlumniData();
+    </script>
+</body>
+</html>
