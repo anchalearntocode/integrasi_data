@@ -1,11 +1,11 @@
 // API Base URL
-const API_URL = '/data_warehouse/backend';
+const API_URL = '/integrasi_data/backend';
 
 // --- Authentication Logic ---
 function checkAuth() {
     const userId = localStorage.getItem('user_id');
     const currentPage = window.location.pathname.split('/').pop();
-    
+
     // Redirect to login if not authenticated and not on login page
     if (!userId && currentPage !== 'index.html' && currentPage !== '') {
         window.location.href = 'index.html';
@@ -22,24 +22,24 @@ function logout() {
 if (document.getElementById('form-login')) {
     document.getElementById('form-login').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const username = document.getElementById('login-username').value;
         const password = document.getElementById('login-password').value;
         const alertEl = document.getElementById('login-alert');
         const btn = e.target.querySelector('button');
-        
+
         btn.textContent = 'Loading...';
         btn.disabled = true;
-        
+
         try {
             const response = await fetch(`${API_URL}/auth.php?action=login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            
+
             const data = await response.json();
-            
+
             if (data.status === 'success') {
                 localStorage.setItem('user_id', data.user.id);
                 localStorage.setItem('username', data.user.username);
@@ -62,29 +62,29 @@ if (document.getElementById('form-login')) {
 if (document.getElementById('form-register')) {
     document.getElementById('form-register').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const username = document.getElementById('reg-username').value;
         const password = document.getElementById('reg-password').value;
         const alertEl = document.getElementById('register-alert');
         const btn = e.target.querySelector('button');
-        
+
         btn.textContent = 'Loading...';
         btn.disabled = true;
-        
+
         try {
             const response = await fetch(`${API_URL}/auth.php?action=register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            
+
             const data = await response.json();
-            
+
             if (data.status === 'success') {
                 alertEl.style.display = 'block';
                 alertEl.className = 'alert alert-success';
                 alertEl.textContent = 'Registrasi berhasil! Silakan login.';
-                
+
                 // Switch to login form after 2 seconds
                 setTimeout(() => {
                     toggleAuth('login');
@@ -111,51 +111,42 @@ if (document.getElementById('form-register')) {
 async function loadAlumniData() {
     const tableBody = document.getElementById('alumni-table-body');
     if (!tableBody) return;
-    
+
     try {
         const response = await fetch(`${API_URL}/alumni.php`);
         const result = await response.json();
-        
+
         if (result.status === 'success') {
             const data = result.data;
-            
+
             if (data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-secondary);">Belum ada data alumni. Silakan input data.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" style="padding: 40px; text-align: center; color: var(--text-tertiary);">Belum ada data alumni. Silakan input data.</td></tr>`;
                 return;
             }
-            
+
             tableBody.innerHTML = '';
-            
+
             // Limit to 5 latest records for preview
             const previewData = data.slice(0, 5);
-            
+
             previewData.forEach(row => {
                 const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid var(--border-color)';
-                
                 tr.innerHTML = `
-                    <td style="padding: 12px;">${row.kode_responden_asli}</td>
-                    <td style="padding: 12px;">${row.tahun_lulus}</td>
-                    <td style="padding: 12px;">
-                        <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
-                            ${row.lama_tunggu_bulan} Bulan
-                        </span>
-                    </td>
-                    <td style="padding: 12px;">${row.kategori_instansi}</td>
-                    <td style="padding: 12px; color: var(--success-color);">${row.range_pendapatan}</td>
+                    <td>${row.kode_responden_asli}</td>
+                    <td>${row.tahun_lulus}</td>
+                    <td><span class="badge badge-info">${row.lama_tunggu_bulan} Bulan</span></td>
+                    <td>${row.kategori_instansi}</td>
+                    <td style="color: var(--success);">${row.range_pendapatan}</td>
                 `;
                 tableBody.appendChild(tr);
             });
-            
-            // Note: Chart logic would go here, processing the `data` array 
-            // and using a library like Chart.js to render into the placeholder elements.
-            
+
         } else {
-            tableBody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--danger-color);">Gagal memuat data.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="5" style="padding: 40px; text-align: center; color: var(--danger);">Gagal memuat data.</td></tr>`;
         }
     } catch (error) {
         console.error(error);
-        tableBody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--danger-color);">Error koneksi ke server.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" style="padding: 40px; text-align: center; color: var(--danger);">Error koneksi ke server.</td></tr>`;
     }
 }
 
@@ -163,28 +154,105 @@ async function loadDashboardCharts() {
     try {
         const response = await fetch(`${API_URL}/dashboard_api.php`);
         const result = await response.json();
-        
+
         if (result.status === 'success') {
             const data = result.data;
-            
-            // 1. Global Stat
+
+            // ── Global Chart.js Defaults (Dark Theme) ──
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.font.size = 12;
+            Chart.defaults.plugins.legend.labels.usePointStyle = true;
+            Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+            Chart.defaults.plugins.legend.labels.padding = 16;
+            Chart.defaults.animation.duration = 800;
+            Chart.defaults.animation.easing = 'easeOutQuart';
+
+            // ── Custom Tooltip Style ──
+            const tooltipConfig = {
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                titleColor: '#f1f5f9',
+                bodyColor: '#cbd5e1',
+                borderColor: 'rgba(99, 102, 241, 0.3)',
+                borderWidth: 1,
+                cornerRadius: 10,
+                padding: 14,
+                titleFont: { size: 13, weight: '600' },
+                bodyFont: { size: 12 },
+                displayColors: true,
+                boxPadding: 6,
+                usePointStyle: true,
+            };
+
+            // ── Curated Color Palette ──
+            const palette = {
+                solid: [
+                    '#818cf8', // Indigo
+                    '#34d399', // Emerald
+                    '#fbbf24', // Amber
+                    '#f87171', // Rose
+                    '#a78bfa', // Violet
+                    '#22d3ee', // Cyan
+                    '#fb923c', // Orange
+                    '#e879f9', // Fuchsia
+                ],
+                translucent: [
+                    'rgba(129, 140, 248, 0.75)',
+                    'rgba(52, 211, 153, 0.75)',
+                    'rgba(251, 191, 36, 0.75)',
+                    'rgba(248, 113, 113, 0.75)',
+                    'rgba(167, 139, 250, 0.75)',
+                    'rgba(34, 211, 238, 0.75)',
+                    'rgba(251, 146, 60, 0.75)',
+                    'rgba(232, 121, 249, 0.75)',
+                ],
+                glow: [
+                    'rgba(129, 140, 248, 0.15)',
+                    'rgba(52, 211, 153, 0.15)',
+                    'rgba(251, 191, 36, 0.15)',
+                    'rgba(248, 113, 113, 0.15)',
+                    'rgba(167, 139, 250, 0.15)',
+                    'rgba(34, 211, 238, 0.15)',
+                    'rgba(251, 146, 60, 0.15)',
+                    'rgba(232, 121, 249, 0.15)',
+                ]
+            };
+
+            // ── Shared Axis & Grid Config ──
+            const gridStyle = {
+                color: 'rgba(255, 255, 255, 0.05)',
+                drawBorder: false,
+            };
+            const tickStyle = {
+                color: '#64748b',
+                font: { size: 11 },
+                padding: 8,
+            };
+
+            // ── 1. Animated Global Stat ──
             const globalStat = document.getElementById('global-waktu-tunggu');
             if (globalStat && data.waktu_tunggu_global) {
-                globalStat.textContent = data.waktu_tunggu_global.rata_rata_waktu_tunggu || 0;
+                const target = parseFloat(data.waktu_tunggu_global.rata_rata_waktu_tunggu) || 0;
+                let current = 0;
+                const step = target / 40;
+                const counter = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(counter);
+                    }
+                    globalStat.textContent = current % 1 === 0 ? Math.round(current) : current.toFixed(1);
+                }, 25);
             }
 
-            // Chart Colors
-            const colors = [
-                'rgba(59, 130, 246, 0.7)',
-                'rgba(16, 185, 129, 0.7)',
-                'rgba(245, 158, 11, 0.7)',
-                'rgba(239, 68, 68, 0.7)',
-                'rgba(139, 92, 246, 0.7)'
-            ];
-
-            // 2. Waktu Tunggu per Prodi (Bar Chart)
+            // ── 2. Waktu Tunggu per Prodi (Gradient Bar Chart) ──
             const ctxWaktuTunggu = document.getElementById('chart-waktu-tunggu-prodi');
             if (ctxWaktuTunggu && data.waktu_tunggu_per_prodi) {
+                const ctx2d = ctxWaktuTunggu.getContext('2d');
+                const grad = ctx2d.createLinearGradient(0, 0, 0, 300);
+                grad.addColorStop(0, 'rgba(99, 102, 241, 0.9)');
+                grad.addColorStop(1, 'rgba(99, 102, 241, 0.2)');
+
                 new Chart(ctxWaktuTunggu, {
                     type: 'bar',
                     data: {
@@ -192,86 +260,217 @@ async function loadDashboardCharts() {
                         datasets: [{
                             label: 'Rata-rata Waktu Tunggu (Bulan)',
                             data: data.waktu_tunggu_per_prodi.map(d => d.rata_rata_waktu_tunggu),
-                            backgroundColor: colors[0],
-                            borderWidth: 1
+                            backgroundColor: grad,
+                            borderColor: 'rgba(129, 140, 248, 0.6)',
+                            borderWidth: 1,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            maxBarThickness: 56,
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                ...tooltipConfig,
+                                callbacks: {
+                                    label: ctx => `  ${ctx.parsed.y} Bulan`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: tickStyle,
+                            },
+                            y: {
+                                grid: gridStyle,
+                                ticks: { ...tickStyle, callback: v => v + ' bln' },
+                                beginAtZero: true,
+                            }
+                        }
+                    }
                 });
             }
 
-            // 3. Jumlah Alumni per Prodi (Doughnut Chart)
+            // ── 3. Alumni per Prodi (Doughnut with center label) ──
             const ctxAlumniProdi = document.getElementById('chart-alumni-prodi');
             if (ctxAlumniProdi && data.alumni_per_prodi) {
+                const totalAlumni = data.alumni_per_prodi.reduce((s, d) => s + parseInt(d.total_alumni), 0);
+
+                // Center text plugin
+                const centerTextPlugin = {
+                    id: 'centerText',
+                    afterDraw(chart) {
+                        const { ctx, chartArea: { width, height, top } } = chart;
+                        ctx.save();
+                        ctx.fillStyle = '#f1f5f9';
+                        ctx.font = "700 28px 'Inter', sans-serif";
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(totalAlumni, width / 2 + chart.chartArea.left - (chart.chartArea.left / 2), top + height / 2 - 10);
+                        ctx.fillStyle = '#64748b';
+                        ctx.font = "500 12px 'Inter', sans-serif";
+                        ctx.fillText('Total Alumni', width / 2 + chart.chartArea.left - (chart.chartArea.left / 2), top + height / 2 + 16);
+                        ctx.restore();
+                    }
+                };
+
                 new Chart(ctxAlumniProdi, {
                     type: 'doughnut',
                     data: {
                         labels: data.alumni_per_prodi.map(d => d.nama_prodi),
                         datasets: [{
                             data: data.alumni_per_prodi.map(d => d.total_alumni),
-                            backgroundColor: colors,
-                            borderWidth: 1
+                            backgroundColor: palette.translucent,
+                            borderColor: palette.solid,
+                            borderWidth: 2,
+                            hoverBorderWidth: 3,
+                            hoverOffset: 8,
+                            spacing: 3,
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false }
-                });
-            }
-
-            // 4. Status Kerja per Prodi (Stacked Bar)
-            const ctxStatusKerja = document.getElementById('chart-status-kerja');
-            if (ctxStatusKerja && data.status_kerja_per_prodi) {
-                // Process data for stacked bar
-                const prodis = [...new Set(data.status_kerja_per_prodi.map(d => d.nama_prodi))];
-                const statuses = [...new Set(data.status_kerja_per_prodi.map(d => d.status_kerja))];
-                
-                const datasets = statuses.map((status, i) => {
-                    return {
-                        label: status,
-                        backgroundColor: colors[i % colors.length],
-                        data: prodis.map(prodi => {
-                            const match = data.status_kerja_per_prodi.find(d => d.nama_prodi === prodi && d.status_kerja === status);
-                            return match ? match.total : 0;
-                        })
-                    };
-                });
-
-                new Chart(ctxStatusKerja, {
-                    type: 'bar',
-                    data: { labels: prodis, datasets: datasets },
-                    options: { 
-                        responsive: true, 
+                    plugins: [centerTextPlugin],
+                    options: {
+                        responsive: true,
                         maintainAspectRatio: false,
-                        scales: { x: { stacked: true }, y: { stacked: true } }
+                        cutout: '68%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { padding: 20 }
+                            },
+                            tooltip: {
+                                ...tooltipConfig,
+                                callbacks: {
+                                    label: ctx => {
+                                        const pct = ((ctx.parsed / totalAlumni) * 100).toFixed(1);
+                                        return `  ${ctx.label}: ${ctx.parsed} alumni (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
                     }
                 });
             }
 
-            // 5. Serapan per Tahun Lulus (Line or Grouped Bar)
+            // ── 4. Status Kerja per Prodi (Grouped Bar — easier to compare) ──
+            const ctxStatusKerja = document.getElementById('chart-status-kerja');
+            if (ctxStatusKerja && data.status_kerja_per_prodi) {
+                const prodis = [...new Set(data.status_kerja_per_prodi.map(d => d.nama_prodi))];
+                const statuses = [...new Set(data.status_kerja_per_prodi.map(d => d.status_kerja))];
+
+                const datasets = statuses.map((status, i) => ({
+                    label: status,
+                    backgroundColor: palette.translucent[i % palette.translucent.length],
+                    borderColor: palette.solid[i % palette.solid.length],
+                    borderWidth: 1.5,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    data: prodis.map(prodi => {
+                        const match = data.status_kerja_per_prodi.find(d => d.nama_prodi === prodi && d.status_kerja === status);
+                        return match ? match.total : 0;
+                    })
+                }));
+
+                new Chart(ctxStatusKerja, {
+                    type: 'bar',
+                    data: { labels: prodis, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { padding: 16 }
+                            },
+                            tooltip: {
+                                ...tooltipConfig,
+                                callbacks: {
+                                    label: ctx => `  ${ctx.dataset.label}: ${ctx.parsed.y} alumni`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: tickStyle,
+                            },
+                            y: {
+                                grid: gridStyle,
+                                ticks: { ...tickStyle, callback: v => v + ' org' },
+                                beginAtZero: true,
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ── 5. Tren Serapan Kerja (Smooth Line, no heavy fill) ──
             const ctxSerapanTahun = document.getElementById('chart-serapan-tahun');
             if (ctxSerapanTahun && data.serapan_per_tahun) {
-                const years = [...new Set(data.serapan_per_tahun.map(d => d.tahun_lulus))];
+                const years = [...new Set(data.serapan_per_tahun.map(d => d.tahun_lulus))].sort();
                 const statuses = [...new Set(data.serapan_per_tahun.map(d => d.status_kerja))];
-                
-                const datasets = statuses.map((status, i) => {
-                    return {
-                        label: status,
-                        borderColor: colors[i % colors.length],
-                        backgroundColor: colors[i % colors.length].replace('0.7', '0.1'),
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true,
-                        data: years.map(year => {
-                            // Sum totals for this year and status across all prodis
-                            const matches = data.serapan_per_tahun.filter(d => d.tahun_lulus == year && d.status_kerja === status);
-                            return matches.reduce((sum, match) => sum + parseInt(match.total), 0);
-                        })
-                    };
-                });
+
+                const datasets = statuses.map((status, i) => ({
+                    label: status,
+                    borderColor: palette.solid[i % palette.solid.length],
+                    backgroundColor: palette.glow[i % palette.glow.length],
+                    borderWidth: 2.5,
+                    tension: 0.4,
+                    fill: false,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: palette.solid[i % palette.solid.length],
+                    pointBorderColor: '#0f172a',
+                    pointBorderWidth: 2,
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 2,
+                    data: years.map(year => {
+                        const matches = data.serapan_per_tahun.filter(d => d.tahun_lulus == year && d.status_kerja === status);
+                        return matches.reduce((sum, match) => sum + parseInt(match.total), 0);
+                    })
+                }));
 
                 new Chart(ctxSerapanTahun, {
                     type: 'line',
-                    data: { labels: years, datasets: datasets },
-                    options: { responsive: true, maintainAspectRatio: false }
+                    data: { labels: years, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { padding: 16 }
+                            },
+                            tooltip: {
+                                ...tooltipConfig,
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    title: items => `Tahun Lulus ${items[0].label}`,
+                                    label: ctx => `  ${ctx.dataset.label}: ${ctx.parsed.y} alumni`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: tickStyle,
+                            },
+                            y: {
+                                grid: gridStyle,
+                                ticks: { ...tickStyle, callback: v => v + ' org' },
+                                beginAtZero: true,
+                            }
+                        }
+                    }
                 });
             }
 
@@ -289,53 +488,53 @@ let allAlumniData = [];
 async function loadFullAlumniData() {
     const tableBody = document.getElementById('full-alumni-table-body');
     if (!tableBody) return;
-    
+
     try {
         const response = await fetch(`${API_URL}/alumni.php`);
         const result = await response.json();
-        
+
         if (result.status === 'success') {
             allAlumniData = result.data;
-            
+
             if (allAlumniData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-secondary);">Belum ada data.</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="7" style="padding: 40px; text-align: center; color: var(--text-tertiary);">Belum ada data.</td></tr>`;
                 return;
             }
-            
+
             // Populate Filters
             const prodiFilter = document.getElementById('filter-prodi');
             const statusFilter = document.getElementById('filter-status');
-            
+
             const prodis = [...new Set(allAlumniData.map(d => d.nama_prodi))];
             const statuses = [...new Set(allAlumniData.map(d => d.status_kerja))];
-            
+
             prodis.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p;
                 opt.textContent = p;
                 prodiFilter.appendChild(opt);
             });
-            
+
             statuses.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s;
                 opt.textContent = s;
                 statusFilter.appendChild(opt);
             });
-            
+
             // Render Table
             renderFullTable();
-            
+
             // Event Listeners
             prodiFilter.addEventListener('change', renderFullTable);
             statusFilter.addEventListener('change', renderFullTable);
-            
+
         } else {
-            tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--danger-color);">Gagal memuat data.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="7" style="padding: 40px; text-align: center; color: var(--danger);">Gagal memuat data.</td></tr>`;
         }
     } catch (err) {
         console.error(err);
-        tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--danger-color);">Error koneksi ke server.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" style="padding: 40px; text-align: center; color: var(--danger);">Error koneksi ke server.</td></tr>`;
     }
 }
 
@@ -343,36 +542,30 @@ function renderFullTable() {
     const tableBody = document.getElementById('full-alumni-table-body');
     const prodiVal = document.getElementById('filter-prodi').value;
     const statusVal = document.getElementById('filter-status').value;
-    
+
     tableBody.innerHTML = '';
-    
+
     const filtered = allAlumniData.filter(row => {
         const matchProdi = prodiVal === 'all' || row.nama_prodi === prodiVal;
         const matchStatus = statusVal === 'all' || row.status_kerja === statusVal;
         return matchProdi && matchStatus;
     });
-    
+
     if (filtered.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-secondary);">Tidak ada data yang cocok dengan filter.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" style="padding: 40px; text-align: center; color: var(--text-tertiary);">Tidak ada data yang cocok dengan filter.</td></tr>`;
         return;
     }
-    
+
     filtered.forEach(row => {
         const tr = document.createElement('tr');
-        tr.style.borderBottom = '1px solid var(--border-color)';
-        
         tr.innerHTML = `
-            <td style="padding: 12px;">${row.kode_responden_asli}</td>
-            <td style="padding: 12px;">${row.nama_prodi}</td>
-            <td style="padding: 12px;">${row.tahun_lulus}</td>
-            <td style="padding: 12px;">
-                <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
-                    ${row.status_kerja}
-                </span>
-            </td>
-            <td style="padding: 12px;">${row.kategori_instansi}</td>
-            <td style="padding: 12px; color: var(--success-color);">${row.range_pendapatan}</td>
-            <td style="padding: 12px;">${row.lama_tunggu_bulan} Bulan</td>
+            <td>${row.kode_responden_asli}</td>
+            <td>${row.nama_prodi}</td>
+            <td>${row.tahun_lulus}</td>
+            <td><span class="badge badge-success">${row.status_kerja}</span></td>
+            <td>${row.kategori_instansi}</td>
+            <td style="color: var(--success);">${row.range_pendapatan}</td>
+            <td><span class="badge badge-info">${row.lama_tunggu_bulan} Bulan</span></td>
         `;
         tableBody.appendChild(tr);
     });

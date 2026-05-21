@@ -1,71 +1,85 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alumni Data - Login</title>
+    <meta name="description" content="Login ke sistem Data Alumni - Tracer Study Serapan Kerja">
+    <title>DataAlumni — Masuk</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <div class="auth-container">
         <!-- Login Form -->
         <div class="auth-card glass" id="login-form">
-            <h2 class="auth-title">Welcome Back</h2>
+            <h2 class="auth-title">Selamat Datang</h2>
+            <p class="auth-subtitle">Masuk ke dashboard tracer study alumni</p>
             <div id="login-alert" class="alert alert-error"></div>
             <form id="form-login">
                 <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" id="login-username" class="form-control" placeholder="Enter your username" required>
+                    <label class="form-label" for="login-username">Username</label>
+                    <input type="text" id="login-username" class="form-control" placeholder="Masukkan username" required
+                        autocomplete="username">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
+                    <label class="form-label" for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Masukkan password"
+                        required autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Sign In</button>
+                <button type="submit" id="btn-login" class="btn btn-primary mt-3">Masuk</button>
             </form>
             <div class="text-center mt-4">
-                <a href="#" class="form-link" onclick="toggleAuth('register')">Don't have an account? Sign up</a>
+                <a href="#" class="form-link" onclick="toggleAuth('register')">Belum punya akun? Daftar di sini</a>
             </div>
         </div>
 
         <!-- Register Form (Hidden by default) -->
         <div class="auth-card glass" id="register-form" style="display: none;">
-            <h2 class="auth-title">Create Account</h2>
+            <h2 class="auth-title">Buat Akun Baru</h2>
+            <p class="auth-subtitle">Daftar untuk mengakses sistem</p>
             <div id="register-alert" class="alert alert-error"></div>
             <form id="form-register">
                 <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" id="reg-username" class="form-control" placeholder="Choose a username" required>
+                    <label class="form-label" for="reg-username">Username</label>
+                    <input type="text" id="reg-username" class="form-control" placeholder="Pilih username" required
+                        autocomplete="username">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="reg-password" class="form-control" placeholder="Create a password" required>
+                    <label class="form-label" for="reg-password">Password</label>
+                    <input type="password" id="reg-password" class="form-control" placeholder="Buat password" required
+                        autocomplete="new-password">
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Sign Up</button>
+                <button type="submit" id="btn-register" class="btn btn-primary mt-3">Daftar</button>
             </form>
             <div class="text-center mt-4">
-                <a href="#" class="form-link" onclick="toggleAuth('login')">Already have an account? Sign in</a>
+                <a href="#" class="form-link" onclick="toggleAuth('login')">Sudah punya akun? Masuk</a>
             </div>
         </div>
     </div>
 
-    <script src="js/app.js?v=2"></script>
+    <script src="js/app.js?v=5"></script>
     <script>
-        // Specific UI script for auth page
         function toggleAuth(type) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+
             if (type === 'register') {
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('register-form').style.display = 'block';
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                registerForm.style.animation = 'slideUp 0.4s ease both';
             } else {
-                document.getElementById('register-form').style.display = 'none';
-                document.getElementById('login-form').style.display = 'block';
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                loginForm.style.animation = 'slideUp 0.4s ease both';
             }
         }
-        
+
         // Redirect if already logged in
         if (localStorage.getItem('user_id')) {
             window.location.href = 'dashboard.html';
         }
     </script>
 </body>
+
 </html>
