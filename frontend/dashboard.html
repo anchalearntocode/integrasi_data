@@ -1,153 +1,222 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alumni Data - Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
-    <!-- Include Chart.js -->
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        .stat-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin: 16px 0;
-        }
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
+      .stat-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 24px;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin: 16px 0;
+      }
+
+      .stat-label {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="layout-wrapper">
-        <!-- Sidebar -->
-        <div class="sidebar glass">
-            <a href="dashboard.html" class="sidebar-logo">DataAlumni</a>
-            <a href="dashboard.html" class="nav-link active">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
-                Dashboard
-            </a>
-            <a href="data.html" class="nav-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                Data Alumni
-            </a>
-            <a href="input.html" class="nav-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                Input Data
-            </a>
-            
-            <a href="#" class="nav-link nav-logout" onclick="logout()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                Logout
-            </a>
+      <!-- Sidebar -->
+      <div class="sidebar glass">
+        <a href="dashboard.html" class="sidebar-logo">DataAlumni</a>
+
+        <a href="dashboard.html" class="nav-link active"> Dashboard </a>
+
+        <a href="data.html" class="nav-link"> Data Alumni </a>
+
+        <a href="input.html" class="nav-link"> Input Data </a>
+
+        <a href="#" class="nav-link nav-logout" onclick="logout()"> Logout </a>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard Overview</h1>
+          <p class="page-subtitle">
+            Visualisasi Data Lulusan dan Ketenagakerjaan
+          </p>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">Dashboard Overview</h1>
-                <p class="page-subtitle">Visualisasi Data Lulusan dan Ketenagakerjaan</p>
-            </div>
-
-            <!-- Global Stat -->
-            <div class="card glass stat-card" style="margin-bottom: 24px;">
-                <h3 class="card-title">Rata-Rata Waktu Tunggu Global</h3>
-                <div class="stat-value" id="global-waktu-tunggu">...</div>
-                <div class="stat-label">Bulan</div>
-            </div>
-
-            <!-- Charts Grid -->
-            <div class="grid">
-                <!-- Card 1: Waktu Tunggu per Prodi -->
-                <div class="card glass">
-                    <div class="card-header">
-                        <h3 class="card-title">Rata-rata Waktu Tunggu per Prodi</h3>
-                    </div>
-                    <div class="chart-container" style="position: relative; height:300px; width:100%">
-                        <canvas id="chart-waktu-tunggu-prodi"></canvas>
-                    </div>
-                </div>
-
-                <!-- Card 2: Jumlah Alumni per Prodi -->
-                <div class="card glass">
-                    <div class="card-header">
-                        <h3 class="card-title">Jumlah Alumni per Prodi</h3>
-                    </div>
-                    <div class="chart-container" style="position: relative; height:300px; width:100%">
-                        <canvas id="chart-alumni-prodi"></canvas>
-                    </div>
-                </div>
-
-                <!-- Card 3: Status Kerja per Prodi -->
-                <div class="card glass" style="grid-column: 1 / -1;">
-                    <div class="card-header">
-                        <h3 class="card-title">Perbandingan Status Kerja Alumni per Prodi</h3>
-                    </div>
-                    <div class="chart-container" style="position: relative; height:350px; width:100%">
-                        <canvas id="chart-status-kerja"></canvas>
-                    </div>
-                </div>
-
-                <!-- Card 4: Serapan Kerja per Tahun Lulus -->
-                <div class="card glass" style="grid-column: 1 / -1;">
-                    <div class="card-header">
-                        <h3 class="card-title">Tren Serapan Kerja Berdasarkan Tahun Lulus</h3>
-                    </div>
-                    <div class="chart-container" style="position: relative; height:350px; width:100%">
-                        <canvas id="chart-serapan-tahun"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Table Preview -->
-            <div class="card glass" style="margin-top: 24px;">
-                <div class="card-header">
-                    <h3 class="card-title">Data Alumni Terbaru</h3>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px;">
-                        <thead>
-                            <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
-                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">ID Responden</th>
-                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">Tahun Lulus</th>
-                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">Waktu Tunggu</th>
-                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">Perusahaan</th>
-                                <th style="padding: 12px; color: var(--text-secondary); font-weight: 500;">Pendapatan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="alumni-table-body">
-                            <!-- Data will be populated here -->
-                            <tr>
-                                <td colspan="5" style="padding: 20px; text-align: center; color: var(--text-secondary);">Memuat data...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+        <!-- Global Stat -->
+        <div class="card glass stat-card" style="margin-bottom: 24px">
+          <h3 class="card-title">Rata-Rata Waktu Tunggu Global</h3>
+          <div class="stat-value" id="global-waktu-tunggu">...</div>
+          <div class="stat-label">Bulan</div>
         </div>
+
+        <!-- Charts Grid -->
+        <div class="grid">
+          <div class="card glass">
+            <div class="card-header">
+              <h3 class="card-title">Rata-rata Waktu Tunggu per Prodi</h3>
+            </div>
+            <div
+              class="chart-container"
+              style="position: relative; height: 300px; width: 100%"
+            >
+              <canvas id="chart-waktu-tunggu-prodi"></canvas>
+            </div>
+          </div>
+
+          <div class="card glass">
+            <div class="card-header">
+              <h3 class="card-title">Jumlah Alumni per Prodi</h3>
+            </div>
+            <div
+              class="chart-container"
+              style="position: relative; height: 300px; width: 100%"
+            >
+              <canvas id="chart-alumni-prodi"></canvas>
+            </div>
+          </div>
+
+          <div class="card glass" style="grid-column: 1 / -1">
+            <div class="card-header">
+              <h3 class="card-title">
+                Perbandingan Status Kerja Alumni per Prodi
+              </h3>
+            </div>
+            <div
+              class="chart-container"
+              style="position: relative; height: 350px; width: 100%"
+            >
+              <canvas id="chart-status-kerja"></canvas>
+            </div>
+          </div>
+
+          <div class="card glass" style="grid-column: 1 / -1">
+            <div class="card-header">
+              <h3 class="card-title">
+                Tren Serapan Kerja Berdasarkan Tahun Lulus
+              </h3>
+            </div>
+            <div
+              class="chart-container"
+              style="position: relative; height: 350px; width: 100%"
+            >
+              <canvas id="chart-serapan-tahun"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Preview -->
+        <div class="card glass" style="margin-top: 24px">
+          <div class="card-header">
+            <h3 class="card-title">Data Alumni Terbaru</h3>
+          </div>
+
+          <div style="overflow-x: auto">
+            <table
+              style="
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 16px;
+                font-size: 14px;
+              "
+            >
+              <thead>
+                <tr
+                  style="
+                    border-bottom: 1px solid var(--border-color);
+                    text-align: left;
+                  "
+                >
+                  <th
+                    style="
+                      padding: 12px;
+                      color: var(--text-secondary);
+                      font-weight: 500;
+                    "
+                  >
+                    ID Responden
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      color: var(--text-secondary);
+                      font-weight: 500;
+                    "
+                  >
+                    Tahun Lulus
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      color: var(--text-secondary);
+                      font-weight: 500;
+                    "
+                  >
+                    Waktu Tunggu
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      color: var(--text-secondary);
+                      font-weight: 500;
+                    "
+                  >
+                    Perusahaan
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      color: var(--text-secondary);
+                      font-weight: 500;
+                    "
+                  >
+                    Pendapatan
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody id="alumni-table-body">
+                <tr>
+                  <td
+                    colspan="5"
+                    style="
+                      padding: 20px;
+                      text-align: center;
+                      color: var(--text-secondary);
+                    "
+                  >
+                    Memuat data...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script src="js/app.js?v=2"></script>
+    <script src="js/app.js?v=500"></script>
+
     <script>
-        // Check authentication
-        checkAuth();
-        // Load data for preview table
-        loadAlumniData();
-        // Load data for dashboard charts
-        if (typeof loadDashboardCharts === 'function') {
-            loadDashboardCharts();
-        }
+      checkAuth();
+      loadAlumniData();
+
+      if (typeof loadDashboardCharts === "function") {
+        loadDashboardCharts();
+      }
     </script>
-</body>
+  </body>
 </html>
