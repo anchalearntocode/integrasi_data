@@ -92,6 +92,17 @@ class DashboardState {
 // Global state instance
 const dashState = new DashboardState();
 
+// Loading overlay helper
+function hideLoadingOverlays() {
+    ['loading-donut', 'loading-clustered', 'loading-line', 'loading-hbar'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.add('hidden');
+            setTimeout(() => el.remove(), 300);
+        }
+    });
+}
+
 
 // ═══════════════════════════════════════════════════════════
 //  2. CHART.JS CONFIGURATION
@@ -106,21 +117,21 @@ Chart.defaults.animation.duration = 600;
 Chart.defaults.animation.easing = 'easeOutQuart';
 
 const PALETTE = {
-    solid: ['#818cf8', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#22d3ee', '#fb923c', '#e879f9'],
+    solid: ['#00e5ff', '#7c4dff', '#00e676', '#ff9100', '#ff4081', '#34d399', '#a78bfa', '#22d3ee'],
     translucent: [
-        'rgba(129,140,248,0.7)', 'rgba(52,211,153,0.7)', 'rgba(251,191,36,0.7)',
-        'rgba(248,113,113,0.7)', 'rgba(167,139,250,0.7)', 'rgba(34,211,238,0.7)',
-        'rgba(251,146,60,0.7)', 'rgba(232,121,249,0.7)',
+        'rgba(0, 229, 255, 0.7)', 'rgba(124, 77, 255, 0.7)', 'rgba(0, 230, 118, 0.7)',
+        'rgba(255, 145, 0, 0.7)', 'rgba(255, 64, 129, 0.7)', 'rgba(52, 211, 153, 0.7)',
+        'rgba(167, 139, 250, 0.7)', 'rgba(34, 211, 238, 0.7)',
     ],
     glow: [
-        'rgba(129,140,248,0.15)', 'rgba(52,211,153,0.15)', 'rgba(251,191,36,0.15)',
-        'rgba(248,113,113,0.15)', 'rgba(167,139,250,0.15)', 'rgba(34,211,238,0.15)',
-        'rgba(251,146,60,0.15)', 'rgba(232,121,249,0.15)',
+        'rgba(0, 229, 255, 0.15)', 'rgba(124, 77, 255, 0.15)', 'rgba(0, 230, 118, 0.15)',
+        'rgba(255, 145, 0, 0.15)', 'rgba(255, 64, 129, 0.15)', 'rgba(52, 211, 153, 0.15)',
+        'rgba(167, 139, 250, 0.15)', 'rgba(34, 211, 238, 0.15)',
     ],
     dimmed: [
-        'rgba(129,140,248,0.18)', 'rgba(52,211,153,0.18)', 'rgba(251,191,36,0.18)',
-        'rgba(248,113,113,0.18)', 'rgba(167,139,250,0.18)', 'rgba(34,211,238,0.18)',
-        'rgba(251,146,60,0.18)', 'rgba(232,121,249,0.18)',
+        'rgba(0, 229, 255, 0.08)', 'rgba(124, 77, 255, 0.08)', 'rgba(0, 230, 118, 0.08)',
+        'rgba(255, 145, 0, 0.08)', 'rgba(255, 64, 129, 0.08)', 'rgba(52, 211, 153, 0.08)',
+        'rgba(167, 139, 250, 0.08)', 'rgba(34, 211, 238, 0.08)',
     ],
 };
 
@@ -670,9 +681,17 @@ async function initDashboard() {
 
         if (result.status !== 'success') {
             console.error('Dashboard API error:', result.message);
+            hideLoadingOverlays();
             const tbody = document.getElementById('dashboard-table-body');
             if (tbody) {
                 tbody.innerHTML = `<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--danger);">Gagal memuat data: ${result.message}</td></tr>`;
+            }
+            if (typeof swalDark === 'function') {
+                swalDark({
+                    icon: 'error',
+                    title: 'Gagal Memuat Dashboard',
+                    text: result.message || 'Terjadi kesalahan saat memuat data dashboard.'
+                });
             }
             return;
         }
@@ -689,6 +708,9 @@ async function initDashboard() {
         // Initial render
         renderAll('init');
 
+        // Hide loading overlays after data is rendered
+        hideLoadingOverlays();
+
         // Reset button handler
         const resetBtn = document.getElementById('btn-reset-filters');
         if (resetBtn) {
@@ -697,9 +719,17 @@ async function initDashboard() {
 
     } catch (err) {
         console.error('Failed to initialize dashboard:', err);
+        hideLoadingOverlays();
         const tbody = document.getElementById('dashboard-table-body');
         if (tbody) {
             tbody.innerHTML = `<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--danger);">Error koneksi ke server.</td></tr>`;
+        }
+        if (typeof swalDark === 'function') {
+            swalDark({
+                icon: 'error',
+                title: 'Koneksi Gagal',
+                text: 'Gagal terhubung ke server. Periksa koneksi Anda.'
+            });
         }
     }
 }

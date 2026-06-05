@@ -4,80 +4,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Login ke sistem Data Alumni - Tracer Study Serapan Kerja">
-    <title>DataAlumni — Masuk</title>
+    <meta name="description" content="Sistem Informasi Alumni Tracer Study - Login Area">
+    <title>AlumniHub — Login Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
     <div class="auth-container">
-        <!-- Login Form -->
-        <div class="auth-card glass" id="login-form">
-            <h2 class="auth-title">Selamat Datang</h2>
-            <p class="auth-subtitle">Masuk ke dashboard tracer study alumni</p>
-            <div id="login-alert" class="alert alert-error"></div>
-            <form id="form-login">
-                <div class="form-group">
-                    <label class="form-label" for="login-username">Username</label>
-                    <input type="text" id="login-username" class="form-control" placeholder="Masukkan username" required
-                        autocomplete="username">
+        <div class="auth-card glass-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
-                <div class="form-group">
-                    <label class="form-label" for="login-password">Password</label>
-                    <input type="password" id="login-password" class="form-control" placeholder="Masukkan password"
-                        required autocomplete="current-password">
-                </div>
-                <button type="submit" id="btn-login" class="btn btn-primary mt-3">Masuk</button>
-            </form>
-            <div class="text-center mt-4">
-                <a href="#" class="form-link" onclick="toggleAuth('register')">Belum punya akun? Daftar di sini</a>
+                <h1 class="auth-title">AlumniHub Admin</h1>
+                <p class="auth-subtitle">Masuk ke sistem manajemen alumni</p>
             </div>
-        </div>
 
-        <!-- Register Form (Hidden by default) -->
-        <div class="auth-card glass" id="register-form" style="display: none;">
-            <h2 class="auth-title">Buat Akun Baru</h2>
-            <p class="auth-subtitle">Daftar untuk mengakses sistem</p>
-            <div id="register-alert" class="alert alert-error"></div>
-            <form id="form-register">
-                <div class="form-group">
-                    <label class="form-label" for="reg-username">Username</label>
-                    <input type="text" id="reg-username" class="form-control" placeholder="Pilih username" required
-                        autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="reg-password">Password</label>
-                    <input type="password" id="reg-password" class="form-control" placeholder="Buat password" required
-                        autocomplete="new-password">
-                </div>
-                <button type="submit" id="btn-register" class="btn btn-primary mt-3">Daftar</button>
-            </form>
-            <div class="text-center mt-4">
-                <a href="#" class="form-link" onclick="toggleAuth('login')">Sudah punya akun? Masuk</a>
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">Masuk</div>
+                <div class="auth-tab" onclick="switchTab('register')">Daftar</div>
             </div>
+
+            <form class="auth-form" id="authForm" onsubmit="handleAuth(event)">
+                <input type="hidden" id="authMode" value="login">
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" class="glass-input" placeholder="Masukkan username admin"
+                            required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" class="glass-input" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 16px;">
+                    <button type="submit" class="btn-submit" style="width: 100%;">
+                        <span id="btnText">Masuk Sekarang</span>
+                        <i class="fas fa-arrow-right-to-bracket" id="btnIcon"></i>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <script src="js/app.js?v=5"></script>
+    <script src="js/app.js?v=8"></script>
     <script>
-        function toggleAuth(type) {
-            const loginForm = document.getElementById('login-form');
-            const registerForm = document.getElementById('register-form');
-
-            if (type === 'register') {
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'block';
-                registerForm.style.animation = 'slideUp 0.4s ease both';
-            } else {
-                registerForm.style.display = 'none';
-                loginForm.style.display = 'block';
-                loginForm.style.animation = 'slideUp 0.4s ease both';
-            }
-        }
-
-        // Redirect if already logged in
+        // Check if already logged in
         if (localStorage.getItem('user_id')) {
             window.location.href = 'dashboard.html';
+        }
+
+        function switchTab(mode) {
+            document.getElementById('authMode').value = mode;
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+
+            if (mode === 'login') {
+                btnText.textContent = 'Masuk Sekarang';
+                btnIcon.className = 'fas fa-arrow-right-to-bracket';
+            } else {
+                btnText.textContent = 'Daftar Akun Baru';
+                btnIcon.className = 'fas fa-user-plus';
+            }
         }
     </script>
 </body>

@@ -4,114 +4,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Lihat seluruh data alumni tracer study serapan kerja">
-    <title>DataAlumni — Data Keseluruhan</title>
+    <meta name="description" content="Tabel Data Alumni Tracer Study">
+    <title>AlumniHub — Data Alumni</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
-    <div class="layout-wrapper">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <a href="dashboard.html" class="sidebar-logo">DataAlumni</a>
-
-            <span class="nav-section-label">Menu</span>
-
-            <a href="dashboard.html" class="nav-link" id="nav-dashboard">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="9"></rect>
-                    <rect x="14" y="3" width="7" height="5"></rect>
-                    <rect x="14" y="12" width="7" height="9"></rect>
-                    <rect x="3" y="16" width="7" height="5"></rect>
-                </svg>
-                Dashboard
-            </a>
-            <a href="data.html" class="nav-link active" id="nav-data">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="3" y1="9" x2="21" y2="9"></line>
-                    <line x1="9" y1="21" x2="9" y2="9"></line>
-                </svg>
-                Data Alumni
-            </a>
-            <a href="input.html" class="nav-link" id="nav-input">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                Input Data
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+    <div class="app-layout">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <a href="dashboard.html" class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap" style="color:#fff;font-size:16px;"></i>
+                </div>
+                <span class="logo-text">AlumniHub</span>
             </a>
 
-            <a href="#" class="nav-link nav-logout" id="nav-logout" onclick="logout()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Keluar
-            </a>
-        </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="data.html" class="nav-item active">
+                    <i class="fas fa-users"></i>
+                    <span>Data Alumni</span>
+                </a>
+                <a href="input.html" class="nav-item">
+                    <i class="fas fa-pen-to-square"></i>
+                    <span>Input Data</span>
+                </a>
+                <a href="api_key.html" class="nav-item">
+                    <i class="fas fa-key"></i>
+                    <span>API Key</span>
+                </a>
+            </nav>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">Data Seluruh Alumni</h1>
-                <p class="page-subtitle">Lihat dan saring semua data lulusan</p>
+            <div class="sidebar-bottom">
+                <div class="user-avatar" id="avatarInitial">A</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebarUsername">Administrator</div>
+                    <div class="user-role">Super Admin</div>
+                </div>
+                <a href="#" class="settings-btn" onclick="logout()" title="Keluar">
+                    <i class="fas fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content" id="mainContent">
+            <!-- TOP BAR -->
+            <div class="topbar">
+                <button class="toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <i class="fas fa-house" style="font-size:11px;"></i>
+                    <span style="color:var(--text-muted);">/</span>
+                    <span>Data Seluruh Alumni</span>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-icon-btn">
+                        <i class="fas fa-bell" style="font-size:13px;"></i>
+                        <div class="notif-dot"></div>
+                    </div>
+                    <div class="user-avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer;"
+                        id="topbarAvatar">A</div>
+                </div>
             </div>
 
-            <!-- Filters -->
-            <div class="filter-bar">
-                <div class="filter-group">
-                    <label class="form-label" for="filter-prodi">Filter Program Studi</label>
-                    <select id="filter-prodi" class="form-control">
-                        <option value="all">Semua Program Studi</option>
+            <!-- PAGE CONTENT -->
+            <section class="page-section active">
+                <div class="page-title">Data Seluruh Alumni</div>
+                <div class="page-subtitle">Kelola dan pantau seluruh data alumni yang terdaftar di sistem.</div>
+
+                <div class="filter-bar">
+                    <div class="input-wrap">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" class="glass-input"
+                            placeholder="Cari kode, program studi, status..." onkeyup="filterTable()">
+                    </div>
+                    <select id="prodiFilter" class="glass-select" onchange="filterTable()">
+                        <option value="">Semua Program Studi</option>
+                        <option value="Teknik Komputer dan Jaringan (TKJ)">Teknik Komputer dan Jaringan</option>
+                        <option value="Teknik Multimedia dan Jaringan (TMJ)">Teknik Multimedia dan Jaringan</option>
                     </select>
+                    <button class="btn btn-teal" onclick="filterTable()">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="btn btn-outline" onclick="resetFilters()">
+                        <i class="fas fa-rotate-left"></i> Reset
+                    </button>
                 </div>
-                <div class="filter-group">
-                    <label class="form-label" for="filter-status">Filter Status Pekerjaan</label>
-                    <select id="filter-status" class="form-control">
-                        <option value="all">Semua Status Pekerjaan</option>
-                    </select>
-                </div>
-            </div>
 
-            <!-- Table -->
-            <div class="card glass">
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Kode</th>
-                                <th>Prodi</th>
-                                <th>Tahun</th>
-                                <th>Status Kerja</th>
-                                <th>Instansi</th>
-                                <th>Pendapatan</th>
-                                <th>Tunggu</th>
-                            </tr>
-                        </thead>
-                        <tbody id="full-alumni-table-body">
-                            <tr>
-                                <td colspan="7" style="padding: 40px; text-align: center; color: var(--text-tertiary);">
-                                    Memuat data...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Table Card -->
+                <div class="glass-card" style="padding: 0; overflow: hidden; position: relative;">
+                    <div class="loading-overlay hidden" id="table-loader">
+                        <div class="spinner"></div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="alumniTable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Kode Responden</th>
+                                    <th>Program Studi</th>
+                                    <th>Lulus</th>
+                                    <th>Jenjang</th>
+                                    <th>Status Kerja</th>
+                                    <th>Waktu Tunggu</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alumniTableBody">
+                                <!-- Skeleton loader shown before JS injects data -->
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="skeleton-cell w-full"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="skeleton-cell w-full"></div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="skeleton-cell w-full"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div
+                        style="padding:16px 20px;border-top:1px solid rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+                        <span class="pagination-info" id="paginationInfo">Menampilkan 0-0 dari 0 data</span>
+                        <div class="pagination" id="paginationControls">
+                            <!-- Pagination buttons injected by JS -->
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 
-    <script src="js/app.js?v=5"></script>
+    <script src="js/app.js?v=8"></script>
     <script>
         checkAuth();
-        if (typeof loadFullAlumniData === 'function') {
-            loadFullAlumniData();
+
+        let sidebarCollapsed = window.innerWidth <= 900;
+        if (sidebarCollapsed) {
+            document.getElementById('sidebar').classList.add('collapsed');
+            document.getElementById('mainContent').classList.add('expanded');
+        }
+
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+            document.getElementById('mainContent').classList.toggle('expanded', sidebarCollapsed);
+
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (window.innerWidth <= 900 && !sidebarCollapsed) {
+                backdrop.classList.add('visible');
+            } else {
+                backdrop.classList.remove('visible');
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (window.innerWidth > 900) {
+                backdrop.classList.remove('visible');
+            } else if (!sidebarCollapsed) {
+                backdrop.classList.add('visible');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = localStorage.getItem('username') || 'Administrator';
+            document.getElementById('sidebarUsername').textContent = username;
+            const initial = username.charAt(0).toUpperCase();
+            document.getElementById('avatarInitial').textContent = initial;
+            document.getElementById('topbarAvatar').textContent = initial;
+
+            fetchData();
+        });
+
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 1;
+        const rowsPerPage = 10;
+
+        async function fetchData() {
+            const loader = document.getElementById('table-loader');
+            loader.classList.remove('hidden');
+
+            try {
+                const response = await fetch('/integrasi_data/backend/alumni.php');
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    allData = result.data;
+                    filteredData = [...allData];
+                    currentPage = 1;
+                    renderTable();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Memuat Data',
+                        text: result.message || 'Terjadi kesalahan.',
+                        background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff'
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi Error',
+                    text: 'Tidak dapat terhubung ke server.',
+                    background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff'
+                });
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('alumniTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: var(--text-tertiary);">Tidak ada data yang ditemukan.</td></tr>';
+                updatePaginationInfo(0, 0, 0);
+                renderPagination(0);
+                return;
+            }
+
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, filteredData.length);
+
+            for (let i = startIndex; i < endIndex; i++) {
+                const row = filteredData[i];
+                let statusBadge = '';
+
+                // Badge color logic
+                const status = (row.status_kerja || '').toLowerCase();
+                if (status.includes('bekerja')) {
+                    statusBadge = `<span class="badge green"><span class="badge-dot"></span>${row.status_kerja}</span>`;
+                } else if (status.includes('belum')) {
+                    statusBadge = `<span class="badge orange"><span class="badge-dot"></span>${row.status_kerja}</span>`;
+                } else if (status.includes('wiraswasta') || status.includes('usaha')) {
+                    statusBadge = `<span class="badge teal"><span class="badge-dot"></span>${row.status_kerja}</span>`;
+                } else if (status.includes('studi') || status.includes('lanjut')) {
+                    statusBadge = `<span class="badge purple"><span class="badge-dot"></span>${row.status_kerja}</span>`;
+                } else {
+                    statusBadge = `<span class="badge gray"><span class="badge-dot"></span>${row.status_kerja || '-'}</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="color:var(--text-secondary);">${i + 1}</td>
+                    <td style="font-weight:600;">${row.kode_responden_asli}</td>
+                    <td>${row.nama_prodi}</td>
+                    <td>${row.tahun_lulus}</td>
+                    <td>${row.jenjang}</td>
+                    <td>${statusBadge}</td>
+                    <td>${row.lama_tunggu_bulan ? row.lama_tunggu_bulan + ' Bulan' : '-'}</td>
+                    <td>
+                        <button class="btn-icon view" title="Lihat Detail" onclick="viewDetail('${row.kode_responden_asli}')">Detail</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+
+            updatePaginationInfo(startIndex + 1, endIndex, filteredData.length);
+            renderPagination(totalPages);
+        }
+
+        function updatePaginationInfo(start, end, total) {
+            document.getElementById('paginationInfo').textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('paginationControls');
+            container.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Prev Button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn arrow';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => { currentPage--; renderTable(); };
+            container.appendChild(prevBtn);
+
+            // Logic for showing limited page numbers like 1, 2, 3 ... 10
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                container.appendChild(createPageBtn(1));
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.className = 'page-ellipsis';
+                    ellipsis.textContent = '...';
+                    container.appendChild(ellipsis);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                container.appendChild(createPageBtn(i));
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement('span');
+                    ellipsis.className = 'page-ellipsis';
+                    ellipsis.textContent = '...';
+                    container.appendChild(ellipsis);
+                }
+                container.appendChild(createPageBtn(totalPages));
+            }
+
+            // Next Button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn arrow';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => { currentPage++; renderTable(); };
+            container.appendChild(nextBtn);
+        }
+
+        function createPageBtn(pageNum) {
+            const btn = document.createElement('button');
+            btn.className = `page-btn ${pageNum === currentPage ? 'active' : ''}`;
+            btn.textContent = pageNum;
+            btn.onclick = () => {
+                currentPage = pageNum;
+                renderTable();
+            };
+            return btn;
+        }
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const prodiTerm = document.getElementById('prodiFilter').value;
+
+            filteredData = allData.filter(row => {
+                const textStr = Object.values(row).join(' ').toLowerCase();
+                const matchesSearch = textStr.includes(searchTerm);
+                const matchesProdi = prodiTerm === '' || row.nama_prodi === prodiTerm;
+                return matchesSearch && matchesProdi;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('prodiFilter').value = '';
+            filteredData = [...allData];
+            currentPage = 1;
+            renderTable();
+        }
+
+        function viewDetail(kode) {
+            const row = allData.find(r => r.kode_responden_asli === kode);
+            if (!row) return;
+
+            let html = '<div style="text-align:left; font-size:13px; color:#cbd5e1;">';
+            html += `<table style="width:100%; border-collapse:collapse;">`;
+            for (const key in row) {
+                if (row[key]) {
+                    html += `<tr><td style="padding:6px; font-weight:600; color:#00e5ff; border-bottom:1px solid rgba(255,255,255,0.05);">${key.replace(/_/g, ' ').toUpperCase()}</td><td style="padding:6px; border-bottom:1px solid rgba(255,255,255,0.05);">${row[key]}</td></tr>`;
+                }
+            }
+            html += `</table></div>`;
+
+            Swal.fire({
+                title: 'Detail Responden',
+                html: html,
+                background: '#0f1420',
+                color: '#f1f5f9',
+                confirmButtonColor: '#00e5ff',
+                width: 600
+            });
         }
     </script>
 </body>

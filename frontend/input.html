@@ -4,245 +4,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Input data alumni tracer study serapan kerja">
-    <title>DataAlumni — Input Data</title>
+    <meta name="description" content="Form Input Data Alumni">
+    <title>AlumniHub — Input Data</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
-    <div class="layout-wrapper">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <a href="dashboard.html" class="sidebar-logo">DataAlumni</a>
-
-            <span class="nav-section-label">Menu</span>
-
-            <a href="dashboard.html" class="nav-link" id="nav-dashboard">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="9"></rect>
-                    <rect x="14" y="3" width="7" height="5"></rect>
-                    <rect x="14" y="12" width="7" height="9"></rect>
-                    <rect x="3" y="16" width="7" height="5"></rect>
-                </svg>
-                Dashboard
-            </a>
-            <a href="data.html" class="nav-link" id="nav-data">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="3" y1="9" x2="21" y2="9"></line>
-                    <line x1="9" y1="21" x2="9" y2="9"></line>
-                </svg>
-                Data Alumni
-            </a>
-            <a href="input.html" class="nav-link active" id="nav-input">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                Input Data
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+    <div class="app-layout">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <a href="dashboard.html" class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap" style="color:#fff;font-size:16px;"></i>
+                </div>
+                <span class="logo-text">AlumniHub</span>
             </a>
 
-            <a href="#" class="nav-link nav-logout" id="nav-logout" onclick="logout()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Keluar
-            </a>
-        </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="data.html" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Data Alumni</span>
+                </a>
+                <a href="input.html" class="nav-item active">
+                    <i class="fas fa-pen-to-square"></i>
+                    <span>Input Data</span>
+                </a>
+                <a href="api_key.html" class="nav-item">
+                    <i class="fas fa-key"></i>
+                    <span>API Key</span>
+                </a>
+            </nav>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">Input Data Alumni</h1>
-                <p class="page-subtitle">Tambahkan data survei tracer study alumni baru</p>
+            <div class="sidebar-bottom">
+                <div class="user-avatar" id="avatarInitial">A</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebarUsername">Administrator</div>
+                    <div class="user-role">Super Admin</div>
+                </div>
+                <a href="#" class="settings-btn" onclick="logout()" title="Keluar">
+                    <i class="fas fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="main-content" id="mainContent">
+            <!-- TOP BAR -->
+            <div class="topbar">
+                <button class="toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <i class="fas fa-house" style="font-size:11px;"></i>
+                    <span style="color:var(--text-muted);">/</span>
+                    <span>Input Data Baru</span>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-icon-btn">
+                        <i class="fas fa-bell" style="font-size:13px;"></i>
+                        <div class="notif-dot"></div>
+                    </div>
+                    <div class="user-avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer;"
+                        id="topbarAvatar">A</div>
+                </div>
             </div>
 
-            <div class="card glass" style="max-width: 860px;">
-                <div id="form-alert" class="alert"></div>
+            <!-- PAGE CONTENT -->
+            <section class="page-section active">
+                <div class="page-title">Tambah Data Alumni Baru</div>
+                <div class="page-subtitle">Pastikan data yang dimasukkan valid dan sesuai dengan format laporan Tracer
+                    Study.</div>
 
-                <form id="form-alumni">
-                    <!-- Section: Identitas -->
-                    <p
-                        style="font-weight: 600; color: var(--text-secondary); font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);">
-                        Identitas Alumni
-                    </p>
-
-                    <div class="two-col-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="kode_responden_asli">Kode Responden Asli</label>
-                            <input type="text" id="kode_responden_asli" class="form-control" placeholder="Contoh: R-001"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="tahun_lulus">Tahun Lulus</label>
-                            <input type="number" id="tahun_lulus" class="form-control" placeholder="Contoh: 2024"
-                                required>
-                        </div>
+                <div class="glass-card" style="max-width: 800px;">
+                    <div class="section-header">
+                        <div class="section-title">Form Data Responden</div>
+                        <div class="section-badge">Dimensi Wajib</div>
                     </div>
 
-                    <div class="two-col-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="nama_prodi">Program Studi</label>
-                            <input type="text" id="nama_prodi" class="form-control" placeholder="Contoh: Teknik Mesin"
-                                required>
+                    <form id="insertDataForm" onsubmit="submitNewData(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="kode_responden_asli">Kode Responden</label>
+                                <input type="text" id="kode_responden_asli" name="kode_responden_asli"
+                                    class="form-input" placeholder="Misal: RESP-2024-001" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nama_prodi">Program Studi</label>
+                                <select id="nama_prodi" name="nama_prodi" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Program Studi</option>
+                                    <option value="Teknik Komputer dan Jaringan (TKJ)">Teknik Komputer dan Jaringan
+                                        (TKJ)</option>
+                                    <option value="Teknik Multimedia dan Jaringan (TMJ)">Teknik Multimedia dan Jaringan
+                                        (TMJ)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tahun_lulus">Tahun Lulus</label>
+                                <select id="tahun_lulus" name="tahun_lulus" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Tahun Lulus</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="jenjang">Jenjang</label>
+                                <select id="jenjang" name="jenjang" class="form-select" required>
+                                    <option value="" disabled selected>Pilih Jenjang</option>
+                                    <option value="D1">D1</option>
+                                    <option value="D3">D3</option>
+                                    <option value="D4">D4</option>
+                                    <option value="S1">S1</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="status_kerja">Status Pekerjaan</label>
+                                <select id="status_kerja" name="status_kerja" class="form-select" required
+                                    onchange="toggleLamaTunggu()">
+                                    <option value="" disabled selected>Pilih Status Kerja</option>
+                                    <option value="Bekerja (full time/part time)">Bekerja (full time/part time)</option>
+                                    <option value="Wiraswasta">Wiraswasta</option>
+                                    <option value="Melanjutkan Pendidikan">Melanjutkan Pendidikan</option>
+                                    <option value="Tidak Bekerja">Tidak Bekerja</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="lama_tunggu_bulan">Waktu Tunggu Mendapatkan Pekerjaan (Bulan)</label>
+                                <input type="number" id="lama_tunggu_bulan" name="lama_tunggu_bulan" class="form-input"
+                                    placeholder="Misal: 3" min="0" required>
+                            </div>
+                            <div class="form-group full"
+                                style="border-top:1px solid rgba(255,255,255,0.05); margin-top:16px; padding-top:24px;">
+                                <div class="form-actions" style="justify-content:flex-end;">
+                                    <button type="button" class="btn-cancel"
+                                        onclick="document.getElementById('insertDataForm').reset(); toggleLamaTunggu();">Batal</button>
+                                    <button type="submit" class="btn-submit"
+                                        style="flex:none; padding-left:32px; padding-right:32px;">
+                                        <i class="fas fa-save"></i> Simpan Data
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="jenjang">Jenjang</label>
-                            <select id="jenjang" class="form-control" required>
-                                <option value="" disabled selected>Pilih Jenjang</option>
-                                <option value="D3">D3</option>
-                                <option value="D4">D4</option>
-                                <option value="S1">S1</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="two-col-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="jurusan">Jurusan</label>
-                            <input type="text" id="jurusan" class="form-control" placeholder="Contoh: Teknik Mesin"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="status_kerja">Status Kerja</label>
-                            <select id="status_kerja" class="form-control" required>
-                                <option value="" disabled selected>Pilih Status Kerja</option>
-                                <option value="Bekerja (Full Time)">Bekerja (Full Time)</option>
-                                <option value="Bekerja (Part Time)">Bekerja (Part Time)</option>
-                                <option value="Wiraswasta">Wiraswasta</option>
-                                <option value="Melanjutkan Pendidikan">Melanjutkan Pendidikan</option>
-                                <option value="Belum Bekerja">Belum Bekerja</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Section: Pekerjaan -->
-                    <p
-                        style="font-weight: 600; color: var(--text-secondary); font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.06em; margin: 28px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-subtle);">
-                        Informasi Pekerjaan
-                    </p>
-
-                    <div class="two-col-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="jenis_pekerjaan">Jenis Pekerjaan</label>
-                            <input type="text" id="jenis_pekerjaan" class="form-control"
-                                placeholder="Contoh: Engineer, Staf IT, dll">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="kategori_instansi">Kategori Instansi/Perusahaan</label>
-                            <input type="text" id="kategori_instansi" class="form-control"
-                                placeholder="Contoh: Swasta, BUMN..." required>
-                        </div>
-                    </div>
-
-                    <div class="two-col-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="jenis_lembaga">Jenis Lembaga</label>
-                            <input type="text" id="jenis_lembaga" class="form-control"
-                                placeholder="Contoh: Instansi Pemerintah">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="range_pendapatan">Range Pendapatan</label>
-                            <select id="range_pendapatan" class="form-control" required>
-                                <option value="" disabled selected>Pilih Pendapatan</option>
-                                <option value="< Rp 2 Juta">&lt; Rp 2 Juta</option>
-                                <option value="Rp 2-3 Juta">Rp 2-3 Juta</option>
-                                <option value="Rp 3-5 Juta">Rp 3-5 Juta</option>
-                                <option value="Rp 5-8 Juta">Rp 5-8 Juta</option>
-                                <option value="> Rp 8 Juta">&gt; Rp 8 Juta</option>
-                                <option value="-">- (Belum Bekerja)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="two-col-grid">
-                        <div class="form-group">
-                            <label class="form-label" for="lama_tunggu_bulan">Lama Tunggu (Bulan)</label>
-                            <input type="number" id="lama_tunggu_bulan" class="form-control" placeholder="Contoh: 2"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="nama_kota">Kota / Lokasi Kerja</label>
-                            <input type="text" id="nama_kota" class="form-control"
-                                placeholder="Contoh: Jakarta, Makassar..." required>
-                        </div>
-                    </div>
-
-                    <button type="submit" id="btn-submit-alumni" class="btn btn-primary" style="margin-top: 12px;">
-                        Simpan Data Alumni
-                    </button>
-                </form>
-            </div>
-        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <script src="js/app.js?v=5"></script>
+    <script src="js/app.js?v=8"></script>
     <script>
         checkAuth();
 
-        document.getElementById('form-alumni').addEventListener('submit', async function (e) {
+        let sidebarCollapsed = window.innerWidth <= 900;
+        if (sidebarCollapsed) {
+            document.getElementById('sidebar').classList.add('collapsed');
+            document.getElementById('mainContent').classList.add('expanded');
+        }
+
+        function toggleSidebar() {
+            sidebarCollapsed = !sidebarCollapsed;
+            document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
+            document.getElementById('mainContent').classList.toggle('expanded', sidebarCollapsed);
+
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (window.innerWidth <= 900 && !sidebarCollapsed) {
+                backdrop.classList.add('visible');
+            } else {
+                backdrop.classList.remove('visible');
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (window.innerWidth > 900) {
+                backdrop.classList.remove('visible');
+            } else if (!sidebarCollapsed) {
+                backdrop.classList.add('visible');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const username = localStorage.getItem('username') || 'Administrator';
+            document.getElementById('sidebarUsername').textContent = username;
+            const initial = username.charAt(0).toUpperCase();
+            document.getElementById('avatarInitial').textContent = initial;
+            document.getElementById('topbarAvatar').textContent = initial;
+        });
+
+        function toggleLamaTunggu() {
+            const status = document.getElementById('status_kerja').value;
+            const lamaInput = document.getElementById('lama_tunggu_bulan');
+            if (status === 'Tidak Bekerja' || status === 'Melanjutkan Pendidikan') {
+                lamaInput.value = 0;
+                lamaInput.readOnly = true;
+                lamaInput.style.opacity = 0.5;
+            } else {
+                lamaInput.readOnly = false;
+                lamaInput.style.opacity = 1;
+                if (lamaInput.value == 0) lamaInput.value = '';
+            }
+        }
+
+        async function submitNewData(e) {
             e.preventDefault();
+            const form = document.getElementById('insertDataForm');
+            const formData = new FormData(form);
 
-            const btn = this.querySelector('button[type="submit"]');
-            btn.textContent = 'Menyimpan...';
-            btn.disabled = true;
-
-            const data = {
-                kode_responden_asli: document.getElementById('kode_responden_asli').value,
-                tahun_lulus: document.getElementById('tahun_lulus').value,
-                nama_prodi: document.getElementById('nama_prodi').value,
-                jenjang: document.getElementById('jenjang').value,
-                jurusan: document.getElementById('jurusan').value,
-                status_kerja: document.getElementById('status_kerja').value,
-                jenis_pekerjaan: document.getElementById('jenis_pekerjaan').value || "-",
-                kategori_instansi: document.getElementById('kategori_instansi').value,
-                jenis_lembaga: document.getElementById('jenis_lembaga').value || "-",
-                range_pendapatan: document.getElementById('range_pendapatan').value,
-                lama_tunggu_bulan: document.getElementById('lama_tunggu_bulan').value,
-                nama_kota: document.getElementById('nama_kota').value
-            };
+            // Tampilkan loading di button
+            const submitBtn = form.querySelector('.btn-submit');
+            const originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            submitBtn.disabled = true;
 
             try {
-                const response = await fetch(`${API_URL}/alumni.php`, {
+                const response = await fetch('/integrasi_data/backend/insert_data.php', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
                 const result = await response.json();
 
-                const alertEl = document.getElementById('form-alert');
-                alertEl.style.display = 'block';
-
                 if (result.status === 'success') {
-                    alertEl.className = 'alert alert-success';
-                    alertEl.textContent = result.message;
-                    this.reset();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Tersimpan!',
+                        text: 'Data alumni berhasil ditambahkan ke database.',
+                        background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff'
+                    });
+                    form.reset();
+                    toggleLamaTunggu();
                 } else {
-                    alertEl.className = 'alert alert-error';
-                    alertEl.textContent = result.message;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Menyimpan',
+                        text: result.message || 'Terjadi kesalahan sistem.',
+                        background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#ff4081'
+                    });
                 }
-            } catch (err) {
-                console.error(err);
-                const alertEl = document.getElementById('form-alert');
-                alertEl.style.display = 'block';
-                alertEl.className = 'alert alert-error';
-                alertEl.textContent = 'Gagal terhubung ke server.';
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi Error',
+                    text: 'Tidak dapat terhubung ke server backend.',
+                    background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#ff4081'
+                });
             } finally {
-                btn.textContent = 'Simpan Data Alumni';
-                btn.disabled = false;
-
-                setTimeout(() => {
-                    document.getElementById('form-alert').style.display = 'none';
-                }, 5000);
+                submitBtn.innerHTML = originalBtnHtml;
+                submitBtn.disabled = false;
             }
-        });
+        }
     </script>
 </body>
 
