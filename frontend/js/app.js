@@ -19,6 +19,21 @@ function checkAuth() {
     // Redirect to login if not authenticated and not on login page
     if (!userId && currentPage !== 'index.html' && currentPage !== '') {
         window.location.href = 'index.html';
+        return;
+    }
+
+    // Auto-generate API Key for frontend usage if missing
+    if (userId && !localStorage.getItem('api_key')) {
+        const array = new Uint8Array(32);
+        crypto.getRandomValues(array);
+        const token = 'dwa_' + Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        localStorage.setItem('api_key', token);
+        
+        const now = new Date().toLocaleString('id-ID', {
+            day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+        localStorage.setItem('api_key_date', now);
     }
 }
 

@@ -209,7 +209,13 @@
             loader.classList.remove('hidden');
 
             try {
-                const response = await fetch('/integrasi_data/backend/alumni.php');
+                const response = await fetch('/integrasi_data/backend/alumni.php', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('api_key')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
                 const result = await response.json();
 
                 if (result.status === 'success') {

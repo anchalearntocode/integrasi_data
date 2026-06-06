@@ -111,47 +111,88 @@ function hideLoadingOverlays() {
 Chart.defaults.color = '#94a3b8';
 Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
 Chart.defaults.font.size = 12;
-Chart.defaults.plugins.legend.labels.usePointStyle = true;
-Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
-Chart.defaults.animation.duration = 600;
-Chart.defaults.animation.easing = 'easeOutQuart';
 
 const PALETTE = {
-    solid: ['#00e5ff', '#7c4dff', '#00e676', '#ff9100', '#ff4081', '#34d399', '#a78bfa', '#22d3ee'],
-    translucent: [
-        'rgba(0, 229, 255, 0.7)', 'rgba(124, 77, 255, 0.7)', 'rgba(0, 230, 118, 0.7)',
-        'rgba(255, 145, 0, 0.7)', 'rgba(255, 64, 129, 0.7)', 'rgba(52, 211, 153, 0.7)',
-        'rgba(167, 139, 250, 0.7)', 'rgba(34, 211, 238, 0.7)',
-    ],
-    glow: [
-        'rgba(0, 229, 255, 0.15)', 'rgba(124, 77, 255, 0.15)', 'rgba(0, 230, 118, 0.15)',
-        'rgba(255, 145, 0, 0.15)', 'rgba(255, 64, 129, 0.15)', 'rgba(52, 211, 153, 0.15)',
-        'rgba(167, 139, 250, 0.15)', 'rgba(34, 211, 238, 0.15)',
-    ],
-    dimmed: [
-        'rgba(0, 229, 255, 0.08)', 'rgba(124, 77, 255, 0.08)', 'rgba(0, 230, 118, 0.08)',
-        'rgba(255, 145, 0, 0.08)', 'rgba(255, 64, 129, 0.08)', 'rgba(52, 211, 153, 0.08)',
-        'rgba(167, 139, 250, 0.08)', 'rgba(34, 211, 238, 0.08)',
-    ],
+    colors: ['#1d4ed8', '#0d9488', '#d97706', '#15803d', '#7c3aed', '#0369a1', '#be123c'],
+    fills: ['rgba(29, 78, 216, 0.15)', 'rgba(13, 148, 136, 0.15)', 'rgba(217, 119, 6, 0.15)', 'rgba(21, 128, 61, 0.15)', 'rgba(124, 58, 237, 0.15)', 'rgba(3, 105, 161, 0.15)', 'rgba(190, 18, 60, 0.15)'],
+    fillsHover: ['rgba(29, 78, 216, 0.28)', 'rgba(13, 148, 136, 0.28)', 'rgba(217, 119, 6, 0.28)', 'rgba(21, 128, 61, 0.28)', 'rgba(124, 58, 237, 0.28)', 'rgba(3, 105, 161, 0.28)', 'rgba(190, 18, 60, 0.28)'],
+    primary: '#1d4ed8',
+    secondary: '#0d9488',
+    tertiary: '#d97706',
+    success: '#15803d',
+    danger: '#be123c',
+    accent: '#7c3aed',
 };
 
-const TOOLTIP = {
-    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-    titleColor: '#f1f5f9',
-    bodyColor: '#cbd5e1',
-    borderColor: 'rgba(99, 102, 241, 0.3)',
-    borderWidth: 1,
-    cornerRadius: 10,
-    padding: 14,
-    titleFont: { size: 13, weight: '600' },
-    bodyFont: { size: 12 },
-    displayColors: true,
-    boxPadding: 6,
-    usePointStyle: true,
-};
+function applyChartDefaults(Chart) {
+    const zinc = { bg: '#09090b', surface: '#18181b', border: '#27272a', borderMid: '#3f3f46', textPrim: '#e4e4e7', textSec: '#a1a1aa', textMuted: '#71717a' };
+    
+    Chart.defaults.color = zinc.textSec;
+    Chart.defaults.borderColor = zinc.border;
+    Chart.defaults.backgroundColor = PALETTE.fills[0];
+    Chart.defaults.animation.duration = 600;
+    Chart.defaults.animation.easing = 'easeOutQuart';
 
-const GRID = { color: 'rgba(255,255,255,0.05)', drawBorder: false };
-const TICK = { color: '#64748b', font: { size: 11 }, padding: 8 };
+    const scaleDefaults = {
+        grid: { color: zinc.border, borderColor: zinc.borderMid, tickColor: zinc.border, drawBorder: true },
+        ticks: { color: zinc.textMuted, font: { family: "'Inter', system-ui, sans-serif", size: 11 }, padding: 8 },
+        border: { color: zinc.borderMid }
+    };
+    
+    Chart.defaults.scales.linear = Chart.defaults.scales.linear || {};
+    Chart.defaults.scales.category = Chart.defaults.scales.category || {};
+    Object.assign(Chart.defaults.scales.linear, scaleDefaults);
+    Object.assign(Chart.defaults.scales.category, scaleDefaults);
+
+    Chart.defaults.plugins.legend.labels.color = zinc.textSec;
+    Chart.defaults.plugins.legend.labels.boxWidth = 10;
+    Chart.defaults.plugins.legend.labels.boxHeight = 10;
+    Chart.defaults.plugins.legend.labels.useBorderRadius = true;
+    Chart.defaults.plugins.legend.labels.borderRadius = 2;
+    Chart.defaults.plugins.legend.labels.font = { family: "'Inter', system-ui, sans-serif", size: 12 };
+
+    Chart.defaults.plugins.tooltip.backgroundColor = zinc.surface;
+    Chart.defaults.plugins.tooltip.borderColor = zinc.borderMid;
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.titleColor = zinc.textPrim;
+    Chart.defaults.plugins.tooltip.bodyColor = zinc.textSec;
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.plugins.tooltip.cornerRadius = 4;
+    Chart.defaults.plugins.tooltip.displayColors = true;
+    Chart.defaults.plugins.tooltip.boxWidth = 10;
+    Chart.defaults.plugins.tooltip.boxHeight = 10;
+    Chart.defaults.plugins.tooltip.titleFont = { family: "'Inter', system-ui, sans-serif", size: 12, weight: '600' };
+    Chart.defaults.plugins.tooltip.bodyFont = { family: "'Inter', system-ui, sans-serif", size: 12 };
+}
+
+function buildDatasets(series, { type = 'bar', tension = 0.35, pointRadius = 3 } = {}) {
+    return series.map((s, i) => {
+        const color = PALETTE.colors[i % PALETTE.colors.length];
+        const fill = PALETTE.fills[i % PALETTE.fills.length];
+        if (type === 'line') {
+            return {
+                label: s.label, data: s.data, borderColor: color, backgroundColor: fill,
+                borderWidth: 2, pointRadius, pointHoverRadius: pointRadius + 2,
+                pointBackgroundColor: color, tension, fill: s.fill ?? false,
+            };
+        }
+        return {
+            label: s.label, data: s.data, backgroundColor: fill,
+            hoverBackgroundColor: PALETTE.fillsHover[i % PALETTE.fillsHover.length],
+            borderColor: color, borderWidth: 1, borderRadius: 3, borderSkipped: false,
+        };
+    });
+}
+
+function hexToRgba(hex, alpha = 1) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// Terapkan default palette ke Chart.js
+applyChartDefaults(Chart);
 
 
 // ═══════════════════════════════════════════════════════════
@@ -292,19 +333,17 @@ function buildDonutChart() {
     const values = Object.values(statusCounts);
     const total = values.reduce((a, b) => a + b, 0);
 
-    // Dim non-selected slices when this chart is the cross-filter source
     const cf = dashState.crossFilter;
     const isSource = cf.source === 'donut';
     const bgColors = labels.map((label, i) => {
-        if (isSource && label !== cf.value) return PALETTE.dimmed[i % PALETTE.dimmed.length];
-        return PALETTE.translucent[i % PALETTE.translucent.length];
+        if (isSource && label !== cf.value) return hexToRgba(PALETTE.colors[i % PALETTE.colors.length], 0.15);
+        return hexToRgba(PALETTE.colors[i % PALETTE.colors.length], 0.85);
     });
     const borderColors = labels.map((label, i) => {
-        if (isSource && label !== cf.value) return PALETTE.dimmed[i % PALETTE.dimmed.length];
-        return PALETTE.solid[i % PALETTE.solid.length];
+        if (isSource && label !== cf.value) return hexToRgba(PALETTE.colors[i % PALETTE.colors.length], 0.15);
+        return PALETTE.colors[i % PALETTE.colors.length];
     });
 
-    // Center text plugin
     const centerTextPlugin = {
         id: 'donutCenter',
         afterDraw(chart) {
@@ -312,12 +351,12 @@ function buildDonutChart() {
             ctx.save();
             const cx = left + width / 2;
             const cy = top + height / 2;
-            ctx.fillStyle = '#f1f5f9';
+            ctx.fillStyle = '#e4e4e7';
             ctx.font = "700 28px 'Inter', sans-serif";
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(total, cx, cy - 8);
-            ctx.fillStyle = '#64748b';
+            ctx.fillStyle = '#71717a';
             ctx.font = "500 11px 'Inter', sans-serif";
             ctx.fillText('Total Alumni', cx, cy + 16);
             ctx.restore();
@@ -332,17 +371,16 @@ function buildDonutChart() {
                 data: values,
                 backgroundColor: bgColors,
                 borderColor: borderColors,
-                borderWidth: 2,
-                hoverBorderWidth: 3,
-                hoverOffset: 10,
-                spacing: 3,
+                borderWidth: 1,
+                hoverBorderWidth: 2,
+                hoverOffset: 4,
             }]
         },
         plugins: [centerTextPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '68%',
+            cutout: '70%',
             onClick: (evt, elements) => {
                 if (elements.length > 0) {
                     const idx = elements[0].index;
@@ -352,10 +390,8 @@ function buildDonutChart() {
             plugins: {
                 legend: {
                     position: 'bottom',
-                    labels: { padding: 16, font: { size: 11 } }
                 },
                 tooltip: {
-                    ...TOOLTIP,
                     callbacks: {
                         label: ctx => {
                             const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
@@ -366,12 +402,10 @@ function buildDonutChart() {
             }
         }
     });
-
-    updateChartSubtitle('donut-subtitle', 'donut');
 }
 
 
-// ── 6b. Clustered Bar — Alumni per Prodi × Pendapatan ──
+// ── 6b. Clustered Bar — Alumni per Prodi × Tahun Lulus ──
 
 function buildClusteredBar() {
     const canvas = document.getElementById('chart-clustered-bar');
@@ -382,22 +416,16 @@ function buildClusteredBar() {
     if (data.length === 0) return;
 
     const prodis = [...new Set(data.map(r => r.nama_prodi))].sort();
-    const pendapatanList = [...new Set(data.map(r => r.range_pendapatan))];
+    const tahunList = [...new Set(data.map(r => String(r.tahun_lulus)))].sort();
 
-    const cf = dashState.crossFilter;
-    const isSource = cf.source === 'clustered';
-
-    const datasets = pendapatanList.map((pend, i) => ({
-        label: pend,
-        backgroundColor: PALETTE.translucent[i % PALETTE.translucent.length],
-        borderColor: PALETTE.solid[i % PALETTE.solid.length],
-        borderWidth: 1.5,
-        borderRadius: 6,
-        borderSkipped: false,
+    const seriesData = tahunList.map((tahun) => ({
+        label: tahun,
         data: prodis.map(prodi =>
-            data.filter(r => r.nama_prodi === prodi && r.range_pendapatan === pend).length
+            data.filter(r => r.nama_prodi === prodi && String(r.tahun_lulus) === tahun).length
         )
     }));
+    
+    const datasets = buildDatasets(seriesData, { type: 'bar' });
 
     charts['clustered'] = new Chart(canvas, {
         type: 'bar',
@@ -412,12 +440,8 @@ function buildClusteredBar() {
                 }
             },
             plugins: {
-                legend: {
-                    position: 'top',
-                    labels: { padding: 12, font: { size: 11 } }
-                },
+                legend: { position: 'top' },
                 tooltip: {
-                    ...TOOLTIP,
                     callbacks: {
                         title: items => items[0].label,
                         label: ctx => `  ${ctx.dataset.label}: ${ctx.parsed.y} alumni`
@@ -425,17 +449,14 @@ function buildClusteredBar() {
                 }
             },
             scales: {
-                x: { grid: { display: false }, ticks: TICK },
+                x: { grid: { display: false } },
                 y: {
-                    grid: GRID,
-                    ticks: { ...TICK, callback: v => v + ' org' },
                     beginAtZero: true,
+                    ticks: { callback: v => v + ' org' }
                 }
             }
         }
     });
-
-    updateChartSubtitle('clustered-subtitle', 'clustered');
 }
 
 
@@ -452,24 +473,14 @@ function buildLineChart() {
     const years = [...new Set(data.map(r => String(r.tahun_lulus)))].sort();
     const statuses = [...new Set(data.map(r => r.status_kerja))];
 
-    const datasets = statuses.map((status, i) => ({
+    const seriesData = statuses.map((status) => ({
         label: status,
-        borderColor: PALETTE.solid[i % PALETTE.solid.length],
-        backgroundColor: PALETTE.glow[i % PALETTE.glow.length],
-        borderWidth: 2.5,
-        tension: 0.4,
-        fill: false,
-        pointRadius: 5,
-        pointHoverRadius: 8,
-        pointBackgroundColor: PALETTE.solid[i % PALETTE.solid.length],
-        pointBorderColor: '#0f172a',
-        pointBorderWidth: 2,
-        pointHoverBorderColor: '#fff',
-        pointHoverBorderWidth: 2,
         data: years.map(year =>
             data.filter(r => String(r.tahun_lulus) === year && r.status_kerja === status).length
         )
     }));
+    
+    const datasets = buildDatasets(seriesData, { type: 'line', tension: 0.4 });
 
     charts['line'] = new Chart(canvas, {
         type: 'line',
@@ -479,12 +490,8 @@ function buildLineChart() {
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: {
-                    position: 'top',
-                    labels: { padding: 12, font: { size: 11 } }
-                },
+                legend: { position: 'top' },
                 tooltip: {
-                    ...TOOLTIP,
                     mode: 'index',
                     intersect: false,
                     callbacks: {
@@ -494,17 +501,14 @@ function buildLineChart() {
                 }
             },
             scales: {
-                x: { grid: { display: false }, ticks: TICK },
+                x: { grid: { display: false } },
                 y: {
-                    grid: GRID,
-                    ticks: { ...TICK, callback: v => v + ' org' },
                     beginAtZero: true,
+                    ticks: { callback: v => v + ' org' }
                 }
             }
         }
     });
-
-    updateChartSubtitle('line-subtitle', 'line');
 }
 
 
@@ -531,26 +535,18 @@ function buildHorizontalBar() {
         prodiMap[p].count > 0 ? parseFloat((prodiMap[p].sum / prodiMap[p].count).toFixed(1)) : 0
     );
 
-    // Gradient fill
-    const ctx2d = canvas.getContext('2d');
-    const grad = ctx2d.createLinearGradient(0, 0, 400, 0);
-    grad.addColorStop(0, 'rgba(99, 102, 241, 0.85)');
-    grad.addColorStop(1, 'rgba(6, 182, 212, 0.65)');
+    const datasets = buildDatasets([{
+        label: 'Rata-rata (Bulan)',
+        data: avgs
+    }], { type: 'bar' });
+    
+    datasets[0].maxBarThickness = 30;
 
     charts['hbar'] = new Chart(canvas, {
         type: 'bar',
         data: {
             labels: prodis,
-            datasets: [{
-                label: 'Rata-rata (Bulan)',
-                data: avgs,
-                backgroundColor: grad,
-                borderColor: 'rgba(129, 140, 248, 0.5)',
-                borderWidth: 1,
-                borderRadius: 8,
-                borderSkipped: false,
-                maxBarThickness: 40,
-            }]
+            datasets
         },
         options: {
             indexAxis: 'y',
@@ -565,7 +561,6 @@ function buildHorizontalBar() {
             plugins: {
                 legend: { display: false },
                 tooltip: {
-                    ...TOOLTIP,
                     callbacks: {
                         title: items => items[0].label,
                         label: ctx => `  Rata-rata: ${ctx.parsed.x} bulan`
@@ -574,16 +569,13 @@ function buildHorizontalBar() {
             },
             scales: {
                 x: {
-                    grid: GRID,
-                    ticks: { ...TICK, callback: v => v + ' bln' },
                     beginAtZero: true,
+                    ticks: { callback: v => v + ' bln' }
                 },
-                y: { grid: { display: false }, ticks: TICK }
+                y: { grid: { display: false } }
             }
         }
     });
-
-    updateChartSubtitle('hbar-subtitle', 'hbar');
 }
 
 
@@ -605,32 +597,7 @@ function updateChartSubtitle(elementId, chartId) {
 }
 
 
-// ═══════════════════════════════════════════════════════════
-//  8. TABLE PREVIEW — Shows filtered data
-// ═══════════════════════════════════════════════════════════
 
-function updateTablePreview() {
-    const tbody = document.getElementById('dashboard-table-body');
-    if (!tbody) return;
-
-    const data = dashState.getFilteredData().slice(0, 8);
-
-    if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="padding: 40px; text-align: center; color: var(--text-tertiary);">Tidak ada data untuk filter ini.</td></tr>`;
-        return;
-    }
-
-    tbody.innerHTML = data.map(r => `
-        <tr>
-            <td>${r.kode_responden_asli || '-'}</td>
-            <td>${r.nama_prodi || '-'}</td>
-            <td>${r.tahun_lulus || '-'}</td>
-            <td><span class="badge badge-success">${r.status_kerja || '-'}</span></td>
-            <td style="color: var(--success);">${r.range_pendapatan || '-'}</td>
-            <td><span class="badge badge-info">${r.lama_tunggu_bulan || 0} Bulan</span></td>
-        </tr>
-    `).join('');
-}
 
 
 // ═══════════════════════════════════════════════════════════
@@ -664,9 +631,6 @@ function renderAll(type) {
     buildClusteredBar();
     buildLineChart();
     buildHorizontalBar();
-
-    // Update table preview
-    updateTablePreview();
 }
 
 
@@ -676,7 +640,16 @@ function renderAll(type) {
 
 async function initDashboard() {
     try {
-        const response = await fetch(`${API_URL}/dashboard_v2_api.php`);
+        // Ambil token dari local storage
+        const token = localStorage.getItem('api_key');
+        
+        const response = await fetch(`${API_URL}/dashboard_api.php`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
         const result = await response.json();
 
         if (result.status !== 'success') {

@@ -220,6 +220,9 @@
             const form = document.getElementById('insertDataForm');
             const formData = new FormData(form);
 
+            // REST DATA REQUIREMENT: Konversi objek FormData ke JSON plain object
+            const payloadData = Object.fromEntries(formData.entries());
+
             // Tampilkan loading di button
             const submitBtn = form.querySelector('.btn-submit');
             const originalBtnHtml = submitBtn.innerHTML;
@@ -227,9 +230,14 @@
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch('/integrasi_data/backend/insert_data.php', {
+                const response = await fetch('/integrasi_data/backend/alumni.php', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Ambil token otentikasi aktif dari localStorage
+                        'Authorization': `Bearer ${localStorage.getItem('api_key')}`
+                    },
+                    body: JSON.stringify(payloadData)
                 });
 
                 const result = await response.json();

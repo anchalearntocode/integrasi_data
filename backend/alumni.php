@@ -7,6 +7,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 require_once 'db.php';
 
+// Proteksi Endpoint: Panggil fungsi validasi token sebelum mengeksekusi logika apapun
+validateBearerToken();
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {

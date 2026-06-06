@@ -4,14 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Generate dan kelola API Key untuk akses REST API Data Alumni">
-    <title>AlumniHub — API Key & Dokumentasi</title>
+    <meta name="description" content="API Workspace — Postman-like REST client for AlumniHub Data Warehouse">
+    <title>AlumniHub — API Workspace</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/postman.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -26,26 +27,12 @@
                 </div>
                 <span class="logo-text">AlumniHub</span>
             </a>
-
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-item">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="data.html" class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>Data Alumni</span>
-                </a>
-                <a href="input.html" class="nav-item">
-                    <i class="fas fa-pen-to-square"></i>
-                    <span>Input Data</span>
-                </a>
-                <a href="api_key.html" class="nav-item active">
-                    <i class="fas fa-key"></i>
-                    <span>API Key</span>
-                </a>
+                <a href="dashboard.html" class="nav-item"><i class="fas fa-chart-pie"></i><span>Dashboard</span></a>
+                <a href="data.html" class="nav-item"><i class="fas fa-users"></i><span>Data Alumni</span></a>
+                <a href="input.html" class="nav-item"><i class="fas fa-pen-to-square"></i><span>Input Data</span></a>
+                <a href="api_key.html" class="nav-item active"><i class="fas fa-key"></i><span>API Key</span></a>
             </nav>
-
             <div class="sidebar-bottom">
                 <div class="user-avatar" id="avatarInitial">A</div>
                 <div class="user-info">
@@ -58,7 +45,7 @@
             </div>
         </aside>
 
-        <!-- ===== MAIN CONTENT ===== -->
+        <!-- ===== MAIN CONTENT — POSTMAN WORKSPACE ===== -->
         <main class="main-content" id="mainContent">
             <!-- TOP BAR -->
             <div class="topbar">
@@ -71,278 +58,199 @@
                     <span>API Workspace</span>
                 </div>
                 <div class="topbar-right">
-                    <div class="topbar-icon-btn">
-                        <i class="fas fa-bell" style="font-size:13px;"></i>
-                        <div class="notif-dot"></div>
-                    </div>
-                    <div class="user-avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer;"
-                        id="topbarAvatar">A</div>
+                    <div class="topbar-icon-btn"><i class="fas fa-bell" style="font-size:13px;"></i><div class="notif-dot"></div></div>
+                    <div class="user-avatar" style="width:32px;height:32px;font-size:12px;cursor:pointer;" id="topbarAvatar">A</div>
                 </div>
             </div>
 
-            <!-- PAGE CONTENT -->
-            <section class="page-section active">
-                <div class="page-title">API Workspace</div>
-                <div class="page-subtitle">Kelola otentikasi API Key dan lihat dokumentasi endpoint REST API sistem.
+            <!-- ══════════════════════════════════════════════════
+                 POSTMAN-NATIVE WORKSPACE (Full Height Layout)
+                 ══════════════════════════════════════════════════ -->
+            <section class="page-section active pm-page">
+
+                <!-- ▬▬▬ Request Tab Bar ▬▬▬ -->
+                <div class="pm-tabbar">
+                    <div class="pm-tabbar-tabs" id="pmTabBar">
+                        <!-- Tabs will be rendered here by JS -->
+                    </div>
+                    <button class="pm-tabbar-new" onclick="addNewTab()" title="New Request"><i class="fas fa-plus"></i></button>
                 </div>
 
-                <div class="api-page-layout">
-
-                    <!-- ════════ Section 1: Key Management ════════ -->
-                    <div class="glass-card key-mgmt-card glow-teal">
-                        <div class="key-mgmt-header">
-                            <div class="key-mgmt-header-left">
-                                <div class="key-icon">
-                                    <i class="fas fa-key"></i>
-                                </div>
-                                <div>
-                                    <div class="key-mgmt-title">Authentication Token</div>
-                                    <div class="key-mgmt-subtitle">Bearer token untuk akses integrasi REST API</div>
-                                </div>
-                            </div>
-                            <span class="key-status key-status-inactive" id="key-status-badge">
-                                <span class="key-status-dot"></span>
-                                Belum ada key
-                            </span>
-                        </div>
-                        <div class="key-mgmt-body">
-                            <!-- Postman-style Key Bar -->
-                            <div class="postman-bar">
-                                <div class="postman-bar-label">BEARER</div>
-                                <input type="text" id="api-key-display" class="postman-bar-input" readonly
-                                    placeholder="Generate API Key untuk melihat token...">
-                                <div class="postman-bar-actions">
-                                    <button class="postman-bar-btn" title="Salin ke clipboard" onclick="copyApiKey()">
-                                        <i class="fas fa-copy" style="font-size: 14px;"></i>
-                                    </button>
-                                    <button class="postman-bar-btn" title="Toggle visibility"
-                                        onclick="toggleKeyVisibility()">
-                                        <i class="fas fa-eye" id="icon-eye" style="font-size: 14px;"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Actions Row -->
-                            <div class="key-actions-row">
-                                <button class="btn-generate" id="btn-generate-key" onclick="generateApiKey()">
-                                    <i class="fas fa-rotate"></i>
-                                    Generate New Key
-                                </button>
-                                <span class="key-created-at" id="key-timestamp"></span>
-                            </div>
-
-                            <!-- Warning Banner -->
-                            <div class="api-banner api-banner-warning" style="margin-top: 20px;">
-                                <i class="fas fa-triangle-exclamation" style="margin-top: 2px;"></i>
-                                <span>Simpan API Key Anda dengan aman. Token ini bersifat rahasia dan digunakan untuk
-                                    otentikasi semua request ke API Data Warehouse.</span>
-                            </div>
-                        </div>
+                <!-- ▬▬▬ URL & Action Bar ▬▬▬ -->
+                <div class="pm-urlbar">
+                    <div class="pm-urlbar-inner">
+                        <select id="pmMethod" class="pm-method-sel" onchange="onMethodChange()">
+                            <option value="GET">GET</option>
+                            <option value="POST" selected>POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="PATCH">PATCH</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                        <input type="text" id="pmUrl" class="pm-url-field" value="http://localhost/integrasi_data/backend/alumni.php" placeholder="Enter request URL" spellcheck="false">
                     </div>
+                    <div class="pm-urlbar-actions">
+                        <div class="pm-send-group">
+                            <button class="pm-btn-send" id="pmBtnSend" onclick="sendRequest()">Send</button>
+                            <button class="pm-btn-send-caret"><i class="fas fa-caret-down"></i></button>
+                        </div>
+                        <button class="pm-btn-ghost" title="Save"><i class="fas fa-save"></i> Save</button>
+                    </div>
+                </div>
 
-                    <!-- ════════ Section 2: Available Endpoints ════════ -->
-                    <div class="glass-card" style="padding: 24px 0;">
-                        <div class="endpoints-section-title" style="padding: 0 24px;">
-                            <i class="fas fa-network-wired"></i>
-                            Available Endpoints — AlumniHub Collection
+                <!-- ▬▬▬ Request / Response Split ▬▬▬ -->
+                <div class="pm-split-container">
+
+                    <!-- ═══ Request Config Panel (Top) ═══ -->
+                    <div class="pm-request-panel" id="pmReqPanel">
+
+                        <!-- Config Tabs -->
+                        <div class="pm-config-tabs" id="pmConfigTabsRow">
+                            <button class="pm-ctab" data-tab="params" onclick="switchConfigTab('params', this)">Params</button>
+                            <button class="pm-ctab active" data-tab="auth" onclick="switchConfigTab('auth', this)">Authorization</button>
+                            <button class="pm-ctab" data-tab="headers" onclick="switchConfigTab('headers', this)">
+                                Headers <span class="pm-ctab-badge">1</span>
+                            </button>
+                            <button class="pm-ctab" data-tab="body" onclick="switchConfigTab('body', this)">
+                                Body <span class="pm-ctab-dot"></span>
+                            </button>
                         </div>
 
-                        <div class="endpoint-list" style="padding: 0 24px;">
-                            <!-- GET Alumni -->
-                            <div class="endpoint-item"
-                                style="flex-direction: column; align-items: stretch; cursor: default; gap: 10px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between;"
-                                    onclick="showEndpointDetail('get-alumni')" style="cursor: pointer;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="method-badge method-get">GET</span>
-                                        <span class="endpoint-path">/backend/alumni.php</span>
-                                        <span class="endpoint-desc">Ambil semua data alumni</span>
+                        <!-- Tab: Params -->
+                        <div class="pm-config-pane" id="pane-params" style="display:none;">
+                            <table class="pm-kv-table">
+                                <thead><tr><th class="pm-kv-chk"></th><th>Key</th><th>Value</th><th>Description</th><th class="pm-kv-act"></th></tr></thead>
+                                <tbody id="pmParamsBody">
+                                    <tr>
+                                        <td class="pm-kv-chk"><input type="checkbox"></td>
+                                        <td><input type="text" class="pm-kv-input" placeholder="Key"></td>
+                                        <td><input type="text" class="pm-kv-input" placeholder="Value"></td>
+                                        <td><input type="text" class="pm-kv-input" placeholder="Description"></td>
+                                        <td class="pm-kv-act"><button class="pm-kv-del" title="Delete"><i class="fas fa-trash-can"></i></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Tab: Authorization -->
+                        <div class="pm-config-pane active" id="pane-auth">
+                            <div class="pm-auth-layout">
+                                <div class="pm-auth-sidebar">
+                                    <label class="pm-label">Type</label>
+                                    <select id="pmAuthType" class="pm-select">
+                                        <option value="bearer" selected>Bearer Token</option>
+                                        <option value="basic">Basic Auth</option>
+                                        <option value="none">No Auth</option>
+                                    </select>
+                                    <div class="pm-auth-hint">
+                                        The authorization header will be automatically generated when you send the request.
                                     </div>
-                                    <button class="btn btn-sm btn-primary"
-                                        onclick="event.stopPropagation(); executeApiTest('GET', '/integrasi_data/backend/alumni.php', this, null)">Send
-                                        Request</button>
+                                    <button class="pm-btn-generate" onclick="generateToken()">
+                                        <i class="fas fa-rotate"></i> Generate Token
+                                    </button>
+                                </div>
+                                <div class="pm-auth-main">
+                                    <label class="pm-label">Token</label>
+                                    <input type="text" id="pmToken" class="pm-token-input" placeholder="dwa_xxxxxxxxxxxx" spellcheck="false">
+                                    <div class="pm-token-meta">
+                                        <span class="pm-token-status" id="pmTokenStatus">
+                                            <span class="pm-dot-indicator inactive"></span> No token
+                                        </span>
+                                        <span class="pm-token-date" id="pmTokenDate"></span>
+                                    </div>
+                                    <div class="pm-auth-info">
+                                        <i class="fas fa-circle-info"></i>
+                                        Token akan dikirim sebagai header <code>Authorization: Bearer &lt;token&gt;</code>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- POST Alumni -->
-                            <div class="endpoint-item"
-                                style="flex-direction: column; align-items: stretch; cursor: default; gap: 10px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between;"
-                                    onclick="showEndpointDetail('post-alumni')" style="cursor: pointer;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="method-badge method-post">POST</span>
-                                        <span class="endpoint-path">/backend/alumni.php</span>
-                                        <span class="endpoint-desc">Tambah data alumni baru</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-primary"
-                                        onclick="event.stopPropagation(); executeApiTest('POST', '/integrasi_data/backend/alumni.php', this, 'payload-post-alumni')">Send
-                                        Request</button>
-                                </div>
-                                <div>
-                                    <textarea id="payload-post-alumni" class="form-input"
-                                        style="font-family: monospace; font-size: 12px; min-height: 120px;"
-                                        spellcheck="false">
-{
+                        <!-- Tab: Headers -->
+                        <div class="pm-config-pane" id="pane-headers" style="display:none;">
+                            <table class="pm-kv-table">
+                                <thead><tr><th class="pm-kv-chk"></th><th>Key</th><th>Value</th><th>Description</th><th class="pm-kv-act"></th></tr></thead>
+                                <tbody id="pmHeadersBody">
+                                    <tr>
+                                        <td class="pm-kv-chk"><input type="checkbox" checked></td>
+                                        <td><input type="text" class="pm-kv-input" value="Content-Type"></td>
+                                        <td><input type="text" class="pm-kv-input" value="application/json"></td>
+                                        <td><input type="text" class="pm-kv-input" placeholder="Description"></td>
+                                        <td class="pm-kv-act"><button class="pm-kv-del" title="Delete"><i class="fas fa-trash-can"></i></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Tab: Body -->
+                        <div class="pm-config-pane" id="pane-body" style="display:none;">
+                            <div class="pm-body-toolbar">
+                                <label class="pm-radio-label"><input type="radio" name="bodyMode" value="none"> none</label>
+                                <label class="pm-radio-label"><input type="radio" name="bodyMode" value="form-data"> form-data</label>
+                                <label class="pm-radio-label"><input type="radio" name="bodyMode" value="urlencoded"> x-www-form-urlencoded</label>
+                                <label class="pm-radio-label"><input type="radio" name="bodyMode" value="raw" checked> raw</label>
+                                <select class="pm-body-lang-sel">
+                                    <option value="json" selected>JSON</option>
+                                    <option value="text">Text</option>
+                                    <option value="xml">XML</option>
+                                </select>
+                            </div>
+                            <textarea id="pmReqBody" class="pm-code-area" spellcheck="false">{
   "kode_responden_asli": "R-001",
   "tahun_lulus": "2024",
   "nama_prodi": "Teknik Komputer dan Jaringan (TKJ)",
-  "jenjang": "D3",
+  "jenjang": "D4",
   "status_kerja": "Bekerja (full time/part time)",
   "lama_tunggu_bulan": "2"
 }</textarea>
-                                </div>
-                            </div>
+                        </div>
 
-                            <!-- GET Dashboard -->
-                            <div class="endpoint-item"
-                                style="flex-direction: column; align-items: stretch; cursor: default; gap: 10px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between;"
-                                    onclick="showEndpointDetail('get-dashboard')" style="cursor: pointer;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="method-badge method-get">GET</span>
-                                        <span class="endpoint-path">/backend/dashboard_v2_api.php</span>
-                                        <span class="endpoint-desc">Data dashboard agregat</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-primary"
-                                        onclick="event.stopPropagation(); executeApiTest('GET', '/integrasi_data/backend/dashboard_v2_api.php', this, null)">Send
-                                        Request</button>
-                                </div>
-                            </div>
+                    </div>
 
-                            <!-- POST Login -->
-                            <div class="endpoint-item"
-                                style="flex-direction: column; align-items: stretch; cursor: default; gap: 10px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between;"
-                                    onclick="showEndpointDetail('post-login')" style="cursor: pointer;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="method-badge method-post">POST</span>
-                                        <span class="endpoint-path">/backend/auth.php?action=login</span>
-                                        <span class="endpoint-desc">Login pengguna</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-primary"
-                                        onclick="event.stopPropagation(); executeApiTest('POST', '/integrasi_data/backend/auth.php?action=login', this, 'payload-post-login')">Send
-                                        Request</button>
-                                </div>
-                                <div>
-                                    <textarea id="payload-post-login" class="form-input"
-                                        style="font-family: monospace; font-size: 12px; min-height: 80px;"
-                                        spellcheck="false">
-{
-  "username": "admin",
-  "password": "password123"
-}</textarea>
-                                </div>
-                            </div>
+                    <!-- ═══ Resizer / Divider ═══ -->
+                    <div class="pm-divider" id="pmDivider">
+                        <div class="pm-divider-grip"><i class="fas fa-grip-lines"></i></div>
+                    </div>
 
-                            <!-- POST Register -->
-                            <div class="endpoint-item"
-                                style="flex-direction: column; align-items: stretch; cursor: default; gap: 10px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between;"
-                                    onclick="showEndpointDetail('post-register')" style="cursor: pointer;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <span class="method-badge method-post">POST</span>
-                                        <span class="endpoint-path">/backend/auth.php?action=register</span>
-                                        <span class="endpoint-desc">Registrasi pengguna baru</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-primary"
-                                        onclick="event.stopPropagation(); executeApiTest('POST', '/integrasi_data/backend/auth.php?action=register', this, 'payload-post-register')">Send
-                                        Request</button>
-                                </div>
-                                <div>
-                                    <textarea id="payload-post-register" class="form-input"
-                                        style="font-family: monospace; font-size: 12px; min-height: 80px;"
-                                        spellcheck="false">
-{
-  "username": "newuser",
-  "password": "newpassword123",
-  "email": "user@example.com"
-}</textarea>
-                                </div>
+                    <!-- ═══ Response Panel (Bottom) ═══ -->
+                    <div class="pm-response-panel" id="pmResPanel">
+
+                        <!-- Response Tabs + Metrics -->
+                        <div class="pm-res-header">
+                            <div class="pm-res-tabs">
+                                <button class="pm-ctab active">Body</button>
+                                <button class="pm-ctab">Cookies</button>
+                                <button class="pm-ctab">Headers</button>
+                            </div>
+                            <div class="pm-res-metrics" id="pmMetrics" style="display:none;">
+                                <span class="pm-metric">Status: <strong class="pm-metric-val" id="pmResStatus">200 OK</strong></span>
+                                <span class="pm-metric">Time: <strong class="pm-metric-val" id="pmResTime">0 ms</strong></span>
+                                <span class="pm-metric">Size: <strong class="pm-metric-val" id="pmResSize">0 B</strong></span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- ════════ Section 3: Code Examples ════════ -->
-                    <div class="glass-card" style="padding: 0; overflow: hidden;">
-                        <div class="code-panel">
-                            <div class="code-panel-tabs">
-                                <button class="code-tab active" onclick="switchCodeTab(this, 'code-curl')">cURL</button>
-                                <button class="code-tab" onclick="switchCodeTab(this, 'code-js')">JavaScript</button>
-                                <button class="code-tab" onclick="switchCodeTab(this, 'code-php')">PHP</button>
-                                <button class="code-tab"
-                                    onclick="switchCodeTab(this, 'code-response')">Response</button>
-                            </div>
-                            <div class="code-panel-body">
-                                <pre class="code-block active" id="code-curl"><span class="hl-comment"># GET — Ambil semua data alumni</span>
-<span class="hl-method">curl</span> -X GET <span class="hl-url">http://localhost/integrasi_data/backend/alumni.php</span> \
-  -H <span class="hl-str">"Authorization: Bearer <span class="hl-header">&lt;API_KEY&gt;</span>"</span> \
-  -H <span class="hl-str">"Content-Type: application/json"</span>
-
-<span class="hl-comment"># POST — Tambah data alumni baru</span>
-<span class="hl-method">curl</span> -X POST <span class="hl-url">http://localhost/integrasi_data/backend/alumni.php</span> \
-  -H <span class="hl-str">"Authorization: Bearer <span class="hl-header">&lt;API_KEY&gt;</span>"</span> \
-  -H <span class="hl-str">"Content-Type: application/json"</span> \
-  -d <span class="hl-str">'{
-    "kode_responden_asli": "R-001",
-    "tahun_lulus": "2024",
-    "nama_prodi": "Teknik Komputer dan Jaringan (TKJ)",
-    "jenjang": "D3",
-    "status_kerja": "Bekerja (full time/part time)",
-    "lama_tunggu_bulan": "2"
-  }'</span></pre>
-                                <pre class="code-block" id="code-js"><span class="hl-comment">// JavaScript (fetch API)</span>
-
-<span class="hl-comment">// GET — Ambil semua data alumni</span>
-<span class="hl-key">const</span> response = <span class="hl-key">await</span> <span class="hl-method">fetch</span>(<span class="hl-str">'/integrasi_data/backend/alumni.php'</span>, {
-  <span class="hl-key">method</span>: <span class="hl-str">'GET'</span>,
-  <span class="hl-key">headers</span>: {
-    <span class="hl-str">'Authorization'</span>: <span class="hl-str">`Bearer ${API_KEY}`</span>,
-    <span class="hl-str">'Content-Type'</span>: <span class="hl-str">'application/json'</span>
-  }
-});
-
-<span class="hl-key">const</span> result = <span class="hl-key">await</span> response.<span class="hl-method">json</span>();
-console.<span class="hl-method">log</span>(result);</pre>
-                                <pre class="code-block" id="code-php"><span class="hl-comment">// PHP (cURL)</span>
-
-<span class="hl-key">$ch</span> = <span class="hl-method">curl_init</span>();
-
-<span class="hl-method">curl_setopt_array</span>(<span class="hl-key">$ch</span>, [
-  <span class="hl-header">CURLOPT_URL</span>        =&gt; <span class="hl-str">'http://localhost/integrasi_data/backend/alumni.php'</span>,
-  <span class="hl-header">CURLOPT_RETURNTRANSFER</span> =&gt; <span class="hl-key">true</span>,
-  <span class="hl-header">CURLOPT_HTTPHEADER</span> =&gt; [
-    <span class="hl-str">'Authorization: Bearer '</span> . <span class="hl-key">$apiKey</span>,
-    <span class="hl-str">'Content-Type: application/json'</span>
-  ]
-]);
-
-<span class="hl-key">$response</span> = <span class="hl-method">curl_exec</span>(<span class="hl-key">$ch</span>);
-<span class="hl-key">$data</span>     = <span class="hl-method">json_decode</span>(<span class="hl-key">$response</span>, <span class="hl-key">true</span>);
-
-<span class="hl-method">curl_close</span>(<span class="hl-key">$ch</span>);
-<span class="hl-method">print_r</span>(<span class="hl-key">$data</span>);</pre>
-                                <pre class="code-block"
-                                    id="code-response">Klik tombol 'Send Request' di atas untuk melihat response dari API di sini.</pre>
+                        <!-- Response Body / Empty State -->
+                        <div class="pm-res-body" id="pmResBody">
+                            <div class="pm-empty-state" id="pmEmptyState">
+                                <div class="pm-empty-icon">
+                                    <i class="fas fa-paper-plane"></i>
+                                </div>
+                                <div class="pm-empty-title">Enter the URL and click Send to get a response</div>
+                                <div class="pm-empty-sub">Or pick a request from the sidebar collection</div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- ════════ Section 4: Usage Info ════════ -->
-                    <div class="api-banner api-banner-info">
-                        <i class="fas fa-circle-info" style="margin-top: 2px;"></i>
-                        <span>Sertakan API Key pada setiap request menggunakan header
-                            <strong style="color: var(--teal);">Authorization: Bearer &lt;API_KEY&gt;</strong>.
-                            Base URL: <strong style="color: var(--purple);">http://localhost/integrasi_data</strong>
-                        </span>
                     </div>
-
                 </div>
+
             </section>
         </main>
     </div>
 
     <script src="js/app.js?v=8"></script>
     <script>
+        // ═══════════════════════════════════════════════════
+        //  INIT
+        // ═══════════════════════════════════════════════════
         checkAuth();
 
         let sidebarCollapsed = window.innerWidth <= 900;
@@ -355,246 +263,321 @@ console.<span class="hl-method">log</span>(result);</pre>
             sidebarCollapsed = !sidebarCollapsed;
             document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
             document.getElementById('mainContent').classList.toggle('expanded', sidebarCollapsed);
-
-            const backdrop = document.getElementById('sidebarBackdrop');
-            if (window.innerWidth <= 900 && !sidebarCollapsed) {
-                backdrop.classList.add('visible');
-            } else {
-                backdrop.classList.remove('visible');
-            }
+            const bd = document.getElementById('sidebarBackdrop');
+            if (window.innerWidth <= 900 && !sidebarCollapsed) bd.classList.add('visible');
+            else bd.classList.remove('visible');
         }
 
         window.addEventListener('resize', () => {
-            const backdrop = document.getElementById('sidebarBackdrop');
-            if (window.innerWidth > 900) {
-                backdrop.classList.remove('visible');
-            } else if (!sidebarCollapsed) {
-                backdrop.classList.add('visible');
-            }
+            const bd = document.getElementById('sidebarBackdrop');
+            if (window.innerWidth > 900) bd.classList.remove('visible');
+            else if (!sidebarCollapsed) bd.classList.add('visible');
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            const username = localStorage.getItem('username') || 'Administrator';
-            document.getElementById('sidebarUsername').textContent = username;
-            const initial = username.charAt(0).toUpperCase();
-            document.getElementById('avatarInitial').textContent = initial;
-            document.getElementById('topbarAvatar').textContent = initial;
+            const u = localStorage.getItem('username') || 'Administrator';
+            document.getElementById('sidebarUsername').textContent = u;
+            const i = u.charAt(0).toUpperCase();
+            document.getElementById('avatarInitial').textContent = i;
+            document.getElementById('topbarAvatar').textContent = i;
+
+            // Load saved token
+            const saved = localStorage.getItem('api_key');
+            if (saved) {
+                document.getElementById('pmToken').value = saved;
+                setTokenStatus(true);
+                document.getElementById('pmTokenDate').textContent = localStorage.getItem('api_key_date') || '';
+            }
+
+            // Init tab bar with default tab
+            initTabs();
+            onMethodChange(); // set method color
         });
 
-        let keyVisible = true;
-        let storedRealKey = '';
 
-        // Load saved API Key if exists
-        const savedKey = localStorage.getItem('api_key');
-        if (savedKey) {
-            storedRealKey = savedKey;
-            document.getElementById('api-key-display').value = savedKey;
-            updateKeyStatus(true);
-            document.getElementById('key-timestamp').textContent =
-                'Dibuat: ' + (localStorage.getItem('api_key_date') || 'Sebelumnya');
+        // ═══════════════════════════════════════════════════
+        //  TAB BAR
+        // ═══════════════════════════════════════════════════
+        let tabs = [];
+        let activeTabId = null;
+
+        function initTabs() {
+            tabs = [{
+                id: 'tab-1',
+                method: 'POST',
+                name: 'Integrasi Alumni API',
+                url: 'http://localhost/integrasi_data/backend/alumni.php'
+            }];
+            activeTabId = 'tab-1';
+            renderTabs();
         }
 
-        function generateApiKey() {
-            const array = new Uint8Array(32);
-            crypto.getRandomValues(array);
-            const token = 'dwa_' + Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        function renderTabs() {
+            const bar = document.getElementById('pmTabBar');
+            bar.innerHTML = tabs.map(t => {
+                const active = t.id === activeTabId ? 'active' : '';
+                const mc = methodColor(t.method);
+                return `
+                <div class="pm-tab-item ${active}" onclick="switchTab('${t.id}')">
+                    <span class="pm-tab-method" style="color:${mc}">${t.method}</span>
+                    <span class="pm-tab-name">${t.name}</span>
+                    ${tabs.length > 1 ? `<button class="pm-tab-close" onclick="event.stopPropagation(); closeTab('${t.id}')"><i class="fas fa-times"></i></button>` : ''}
+                </div>`;
+            }).join('');
+        }
 
-            storedRealKey = token;
-            const input = document.getElementById('api-key-display');
-            input.value = keyVisible ? token : maskKey(token);
-            input.style.animation = 'none';
-            input.offsetHeight;
-            input.style.animation = 'fadeIn 0.4s ease both';
+        function switchTab(id) {
+            activeTabId = id;
+            const tab = tabs.find(t => t.id === id);
+            if (tab) {
+                document.getElementById('pmMethod').value = tab.method;
+                document.getElementById('pmUrl').value = tab.url;
+                onMethodChange();
+            }
+            renderTabs();
+        }
+
+        const EMPTY_STATE_HTML = `
+            <div class="pm-empty-state" id="pmEmptyState">
+                <div class="pm-empty-icon"><i class="fas fa-paper-plane"></i></div>
+                <div class="pm-empty-title">Enter the URL and click Send to get a response</div>
+                <div class="pm-empty-sub">Or pick a request from the sidebar collection</div>
+            </div>`;
+
+        function addNewTab() {
+            const id = 'tab-' + Date.now();
+            tabs.push({ id, method: 'GET', name: 'New Request', url: '' });
+            activeTabId = id;
+            document.getElementById('pmMethod').value = 'GET';
+            document.getElementById('pmUrl').value = '';
+            document.getElementById('pmResBody').innerHTML = EMPTY_STATE_HTML;
+            document.getElementById('pmMetrics').style.display = 'none';
+            onMethodChange();
+            renderTabs();
+        }
+
+        function closeTab(id) {
+            tabs = tabs.filter(t => t.id !== id);
+            if (activeTabId === id) activeTabId = tabs[0]?.id;
+            if (tabs.length === 0) addNewTab();
+            else switchTab(activeTabId);
+        }
+
+        function methodColor(m) {
+            return { GET: '#0cbb52', POST: '#ffb400', PUT: '#097bed', PATCH: '#a855f7', DELETE: '#eb2013' }[m] || '#888';
+        }
+
+
+        // ═══════════════════════════════════════════════════
+        //  METHOD SELECT COLOR
+        // ═══════════════════════════════════════════════════
+        function onMethodChange() {
+            const sel = document.getElementById('pmMethod');
+            sel.style.color = methodColor(sel.value);
+            // Sync active tab
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (tab) {
+                tab.method = sel.value;
+                renderTabs();
+            }
+        }
+
+        // Sync URL changes back to tab
+        document.getElementById('pmUrl').addEventListener('input', function () {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (tab) tab.url = this.value;
+        });
+
+
+        // ═══════════════════════════════════════════════════
+        //  CONFIG TABS (Params / Auth / Headers / Body)
+        // ═══════════════════════════════════════════════════
+        function switchConfigTab(name, btn) {
+            // Deactivate only REQUEST config tabs (not response tabs)
+            document.querySelectorAll('#pmConfigTabsRow .pm-ctab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.pm-config-pane').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+            // Activate target
+            btn.classList.add('active');
+            const pane = document.getElementById('pane-' + name);
+            if (pane) {
+                pane.style.display = (name === 'body') ? 'flex' : 'block';
+                pane.classList.add('active');
+            }
+        }
+
+
+        // ═══════════════════════════════════════════════════
+        //  AUTHORIZATION — TOKEN GENERATION
+        // ═══════════════════════════════════════════════════
+        function generateToken() {
+            const arr = new Uint8Array(32);
+            crypto.getRandomValues(arr);
+            const token = 'dwa_' + Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+
+            document.getElementById('pmToken').value = token;
+            localStorage.setItem('api_key', token);
 
             const now = new Date().toLocaleString('id-ID', {
                 day: '2-digit', month: 'short', year: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             });
-            localStorage.setItem('api_key', token);
             localStorage.setItem('api_key_date', now);
+            document.getElementById('pmTokenDate').textContent = 'Created: ' + now;
+            setTokenStatus(true);
 
-            document.getElementById('key-timestamp').textContent = 'Dibuat: ' + now;
-            updateKeyStatus(true);
+            // Animate the input
+            const inp = document.getElementById('pmToken');
+            inp.style.animation = 'none';
+            inp.offsetHeight;
+            inp.style.animation = 'pmFlash 0.5s ease';
 
             Swal.fire({
-                icon: 'success',
-                title: 'Key Generated!',
-                html: '<span style="color:#94a3b8;">Token baru berhasil dibuat. Salin dan simpan dengan aman.</span>',
-                background: '#0f1420',
-                color: '#f1f5f9',
-                confirmButtonColor: '#00e5ff',
-                timer: 3000,
-                timerProgressBar: true
+                icon: 'success', title: 'Token Generated',
+                html: '<span style="color:#94a3b8;">Bearer token baru berhasil dibuat.</span>',
+                background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff',
+                timer: 2500, timerProgressBar: true
             });
         }
 
-        function copyApiKey() {
-            if (!storedRealKey) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Belum Ada Key',
-                    text: 'Silakan generate API Key terlebih dahulu.',
-                    background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff'
-                });
-                return;
-            }
-
-            navigator.clipboard.writeText(storedRealKey).then(() => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Tersalin!',
-                    text: 'API Key berhasil disalin ke clipboard.',
-                    background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff',
-                    timer: 1500, timerProgressBar: true, showConfirmButton: false
-                });
-            }).catch(() => {
-                const tmpInput = document.createElement('textarea');
-                tmpInput.value = storedRealKey;
-                document.body.appendChild(tmpInput);
-                tmpInput.select();
-                document.execCommand('copy');
-                document.body.removeChild(tmpInput);
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Tersalin!',
-                    text: 'API Key berhasil disalin ke clipboard.',
-                    background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff',
-                    timer: 1500, timerProgressBar: true, showConfirmButton: false
-                });
-            });
-        }
-
-        function toggleKeyVisibility() {
-            if (!storedRealKey) return;
-            keyVisible = !keyVisible;
-            const input = document.getElementById('api-key-display');
-            input.value = keyVisible ? storedRealKey : maskKey(storedRealKey);
-            const icon = document.getElementById('icon-eye');
-            if (keyVisible) {
-                icon.className = 'fas fa-eye';
-            } else {
-                icon.className = 'fas fa-eye-slash';
-            }
-        }
-
-        function maskKey(key) {
-            if (!key) return '';
-            return key.substring(0, 8) + '•'.repeat(Math.max(0, key.length - 12)) + key.substring(key.length - 4);
-        }
-
-        function updateKeyStatus(active) {
-            const badge = document.getElementById('key-status-badge');
+        function setTokenStatus(active) {
+            const el = document.getElementById('pmTokenStatus');
             if (active) {
-                badge.className = 'key-status key-status-active';
-                badge.innerHTML = '<span class="key-status-dot"></span> Aktif';
+                el.innerHTML = '<span class="pm-dot-indicator active"></span> Active';
             } else {
-                badge.className = 'key-status key-status-inactive';
-                badge.innerHTML = '<span class="key-status-dot"></span> Belum ada key';
+                el.innerHTML = '<span class="pm-dot-indicator inactive"></span> No token';
             }
         }
 
-        function switchCodeTab(btn, codeId) {
-            document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.code-block').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(codeId).classList.add('active');
-        }
 
-        function showEndpointDetail(id) {
-            const details = {
-                'get-alumni': { method: 'GET', path: '/backend/alumni.php', desc: 'Mengembalikan array semua data alumni dalam format JSON. Tidak memerlukan body.' },
-                'post-alumni': { method: 'POST', path: '/backend/alumni.php', desc: 'Menambahkan data alumni baru. Memerlukan body JSON dengan field: kode_responden_asli, tahun_lulus, nama_prodi, jenjang, status_kerja, lama_tunggu_bulan.' },
-                'get-dashboard': { method: 'GET', path: '/backend/dashboard_v2_api.php', desc: 'Mengembalikan data agregat dashboard termasuk list alumni dan list dimensi untuk filter.' },
-                'post-login': { method: 'POST', path: '/backend/auth.php?action=login', desc: 'Login dengan body JSON: { username, password }. Mengembalikan auth state success.' },
-                'post-register': { method: 'POST', path: '/backend/auth.php?action=register', desc: 'Registrasi user baru dengan body JSON: { username, password }.' }
-            };
+        // ═══════════════════════════════════════════════════
+        //  SEND REQUEST (Core Engine)
+        // ═══════════════════════════════════════════════════
+        async function sendRequest() {
+            const method = document.getElementById('pmMethod').value;
+            const url = document.getElementById('pmUrl').value;
+            const authType = document.getElementById('pmAuthType').value;
+            const token = document.getElementById('pmToken').value;
+            const reqBody = document.getElementById('pmReqBody').value;
 
-            const d = details[id];
-            if (!d) return;
+            const resBody = document.getElementById('pmResBody');
+            const metrics = document.getElementById('pmMetrics');
+            const btn = document.getElementById('pmBtnSend');
 
-            const methodColor = d.method === 'GET' ? '#34d399' : '#fbbf24';
-
-            Swal.fire({
-                title: `<span style="font-size:14px;color:${methodColor};font-weight:800;font-family:monospace;">${d.method}</span> <span style="font-size:14px;color:#00e5ff;font-family:monospace;">${d.path}</span>`,
-                html: `<p style="color:#94a3b8;font-size:13px;line-height:1.7;text-align:left;">${d.desc}</p>`,
-                background: '#0f1420',
-                color: '#f1f5f9',
-                confirmButtonColor: '#00e5ff',
-                confirmButtonText: 'Tutup',
-                width: 520
-            });
-        }
-
-        async function executeApiTest(method, url, btn, payloadId) {
-            const token = storedRealKey || document.getElementById('api-key-display').value;
-
-            if (!token || token.includes('•')) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Token Tidak Valid',
-                    text: 'Silakan generate token terlebih dahulu.',
-                    background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff'
-                });
+            if (!url) {
+                Swal.fire({ icon: 'warning', title: 'URL Kosong', text: 'Masukkan URL endpoint terlebih dahulu.',
+                    background: '#0f1420', color: '#f1f5f9', confirmButtonColor: '#00e5ff' });
                 return;
             }
 
-            const responseTabBtn = document.querySelector('.code-tab[onclick*="code-response"]');
-            if (responseTabBtn) switchCodeTab(responseTabBtn, 'code-response');
-
-            const responseBlock = document.getElementById('code-response');
-            responseBlock.innerHTML = '<span style="color:#00e5ff;">Loading...</span>';
-
-            const originalBtnText = btn.textContent;
-            btn.textContent = 'Processing...';
+            // Loading state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending';
             btn.disabled = true;
+            resBody.innerHTML = '<div class="pm-loading"><div class="pm-loading-spinner"></div><span>Sending request…</span></div>';
+            metrics.style.display = 'none';
 
-            const options = {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            };
+            // Build options
+            const opts = { method, headers: { 'Content-Type': 'application/json' } };
+            if (authType === 'bearer' && token) opts.headers['Authorization'] = `Bearer ${token}`;
 
-            if (method === 'POST' && payloadId) {
-                const payloadStr = document.getElementById(payloadId).value;
-                try {
-                    JSON.parse(payloadStr);
-                    options.body = payloadStr;
-                } catch (e) {
-                    responseBlock.innerHTML = `<span style="color:#ff4081;">Error: JSON Payload tidak valid.</span>\n${e.message}`;
-                    btn.textContent = originalBtnText;
-                    btn.disabled = false;
-                    return;
+            if (!['GET', 'HEAD'].includes(method) && reqBody.trim()) {
+                try { JSON.parse(reqBody); opts.body = reqBody; }
+                catch (e) {
+                    resBody.innerHTML = `<pre class="pm-res-pre pm-error"><span class="pm-err-icon">✖</span> Invalid JSON body\n\n${escapeHtml(e.message)}</pre>`;
+                    btn.innerHTML = 'Send'; btn.disabled = false; return;
                 }
             }
+
+            const t0 = performance.now();
 
             try {
-                const res = await fetch(url, options);
-                let resultText = await res.text();
+                const res = await fetch(url, opts);
+                const dur = Math.round(performance.now() - t0);
+                let text = await res.text();
+                const size = new Blob([text]).size;
+
+                // Metrics
+                const statusEl = document.getElementById('pmResStatus');
+                statusEl.textContent = `${res.status} ${res.statusText}`;
+                statusEl.className = res.ok ? 'pm-metric-val pm-ok' : 'pm-metric-val pm-err';
+                document.getElementById('pmResTime').textContent = `${dur} ms`;
+                document.getElementById('pmResSize').textContent = formatBytes(size);
+                metrics.style.display = 'flex';
+
+                // Pretty-print JSON
                 try {
-                    const resultJson = JSON.parse(resultText);
-                    const formattedJson = JSON.stringify(resultJson, null, 2);
-                    const colorized = formattedJson
-                        .replace(/"(.*?)":/g, '<span class="hl-key">"$1"</span>:')
-                        .replace(/: "(.*?)"/g, ': <span class="hl-str">"$1"</span>')
-                        .replace(/: (\d+)/g, ': <span class="hl-header">$1</span>')
-                        .replace(/: (true|false|null)/g, ': <span class="hl-key">$1</span>');
-                    responseBlock.innerHTML = colorized;
-                } catch (e) {
-                    responseBlock.innerHTML = `<span style="color:#ff4081;">Error: Response is not valid JSON.</span>\n${resultText}`;
+                    const json = JSON.parse(text);
+                    const pretty = JSON.stringify(json, null, 2);
+                    resBody.innerHTML = `<pre class="pm-res-pre">${syntaxHighlight(escapeHtml(pretty))}</pre>`;
+                } catch {
+                    resBody.innerHTML = `<pre class="pm-res-pre">${escapeHtml(text)}</pre>`;
                 }
+
             } catch (err) {
-                responseBlock.innerHTML = `<span style="color:#ff4081;">Error: Fetch failed.</span>\n${err.message}`;
+                resBody.innerHTML = `<pre class="pm-res-pre pm-error"><span class="pm-err-icon">✖</span> Could not send request\n\nError: ${escapeHtml(err.message)}\n\nPastikan URL benar dan server sedang aktif.</pre>`;
             } finally {
-                btn.textContent = originalBtnText;
+                btn.innerHTML = 'Send';
                 btn.disabled = false;
-                
-                // Scroll otomatis ke bagian response agar terlihat oleh user
-                responseBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
+
+
+        // ═══════════════════════════════════════════════════
+        //  UTILITIES
+        // ═══════════════════════════════════════════════════
+        function escapeHtml(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function syntaxHighlight(json) {
+            return json
+                .replace(/&quot;(.*?)&quot;:/g, '<span class="pm-json-key">&quot;$1&quot;</span>:')
+                .replace(/: &quot;(.*?)&quot;/g, ': <span class="pm-json-str">&quot;$1&quot;</span>')
+                .replace(/: (\d+)/g, ': <span class="pm-json-num">$1</span>')
+                .replace(/: (true|false|null)/g, ': <span class="pm-json-bool">$1</span>');
+        }
+
+        function formatBytes(b) {
+            if (b < 1024) return b + ' B';
+            if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+            return (b / 1048576).toFixed(1) + ' MB';
+        }
+
+
+        // ═══════════════════════════════════════════════════
+        //  RESIZABLE DIVIDER
+        // ═══════════════════════════════════════════════════
+        (function initResizer() {
+            const divider = document.getElementById('pmDivider');
+            const reqPanel = document.getElementById('pmReqPanel');
+            const resPanel = document.getElementById('pmResPanel');
+            const container = document.querySelector('.pm-split-container');
+            let isDragging = false;
+
+            divider.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                document.body.style.cursor = 'row-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const rect = container.getBoundingClientRect();
+                const offset = e.clientY - rect.top;
+                const pct = (offset / rect.height) * 100;
+                const clamped = Math.max(20, Math.min(80, pct));
+                reqPanel.style.flex = `0 0 ${clamped}%`;
+                resPanel.style.flex = `0 0 ${100 - clamped}%`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+            });
+        })();
     </script>
 </body>
-
 </html>

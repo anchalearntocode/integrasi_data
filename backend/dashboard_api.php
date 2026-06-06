@@ -1,5 +1,6 @@
 <?php
 // backend/dashboard_api.php
+// Returns individual records + dimension lists + summary for Power BI-style dashboard
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET");
@@ -7,77 +8,63 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 require_once 'db.php';
 
+// Kunci data analitik dengan token validasi
+validateBearerToken();
+
 try {
-    $results = [];
-
-    // 1. Perbandingan Rata-rata Waktu Tunggu per Prodi
-    $q1 = "
+    // 1. All individual alumni records (with full dimension joins)
+    $q = "
         SELECT 
-            dp.nama_prodi AS program_studi,
-            ROUND(AVG(f.lama_tunggu_bulan)) AS rata_rata_waktu_tunggu
+            f.id_fact, a.kode_alumni, a.kode_responden_asli, t.tahun_lulus, 
+            p.nama_prodi, p.jenjang, s.status_kerja, s.jenis_pekerjaan,
+            i.kategori_instansi, i.jenis_lembaga, k.nama_kota,
+            pd.range_pendapatan, f.lama_tunggu_bulan
         FROM fact_serapan_kerja f
-        JOIN dim_prodi dp ON f.id_prodi = dp.id_prodi
-        GROUP BY dp.nama_prodi
-        ORDER BY AVG(f.lama_tunggu_bulan) ASC;
+        JOIN dim_alumni a ON f.id_alumni = a.id_alumni
+        JOIN dim_tahun t ON a.id_tahun = t.id_tahun
+        JOIN dim_prodi p ON f.id_prodi = p.id_prodi
+        JOIN dim_status s ON f.id_status = s.id_status
+        JOIN dim_instansi i ON f.id_instansi = i.id_instansi
+        JOIN dim_kota k ON i.id_kota = k.id_kota
+        JOIN dim_pendapatan pd ON f.id_pendapatan = pd.id_pendapatan
+        ORDER BY f.id_fact DESC
     ";
-    $stmt1 = $pdo->query($q1);
-    $results['waktu_tunggu_per_prodi'] = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->query($q);
+    $alumni = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. Rata-rata Waktu tunggu kerja (bulan)
-    $q2 = "
-        SELECT 
-            ROUND(AVG(lama_tunggu_bulan)) AS rata_rata_waktu_tunggu
-        FROM fact_serapan_kerja;
-    ";
-    $stmt2 = $pdo->query($q2);
-    $results['waktu_tunggu_global'] = $stmt2->fetch(PDO::FETCH_ASSOC);
+    // 2. Distinct dimension values for slicer panels
+    $dims = [];
 
-    // 3. Jumlah alumni per prodi
-    $q3 = "
-        SELECT 
-            dp.nama_prodi, 
-            COUNT(*) AS total_alumni
-        FROM fact_serapan_kerja f
-        JOIN dim_prodi dp ON f.id_prodi = dp.id_prodi
-        GROUP BY dp.nama_prodi;
-    ";
-    $stmt3 = $pdo->query($q3);
-    $results['alumni_per_prodi'] = $stmt3->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->query("SELECT DISTINCT tahun_lulus FROM dim_tahun ORDER BY tahun_lulus");
+    $dims['tahun'] = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'tahun_lulus');
 
-    // 4. Perbandingan alumni perprodi
-    $q4 = "
-        SELECT 
-            dp.nama_prodi, 
-            ds.status_kerja, 
-            COUNT(*) AS total
-        FROM fact_serapan_kerja f
-        JOIN dim_prodi dp ON f.id_prodi = dp.id_prodi
-        JOIN dim_status ds ON f.id_status = ds.id_status
-        GROUP BY dp.nama_prodi, ds.status_kerja
-        ORDER BY dp.nama_prodi;
-    ";
-    $stmt4 = $pdo->query($q4);
-    $results['status_kerja_per_prodi'] = $stmt4->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->query("SELECT DISTINCT nama_prodi FROM dim_prodi ORDER BY nama_prodi");
+    $dims['prodi'] = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'nama_prodi');
 
-    // 5. Serapan Kerja Berdasarkan Tahun Lulus
-    $q5 = "
-        SELECT 
-            dt.tahun_lulus, 
-            dp.nama_prodi, 
-            ds.status_kerja, 
-            COUNT(*) AS total
-        FROM fact_serapan_kerja f
-        JOIN dim_alumni da ON f.id_alumni = da.id_alumni
-        JOIN dim_tahun dt ON da.id_tahun = dt.id_tahun
-        JOIN dim_prodi dp ON f.id_prodi = dp.id_prodi
-        JOIN dim_status ds ON f.id_status = ds.id_status
-        GROUP BY dt.tahun_lulus, dp.nama_prodi, ds.status_kerja
-        ORDER BY dt.tahun_lulus, dp.nama_prodi;
-    ";
-    $stmt5 = $pdo->query($q5);
-    $results['serapan_per_tahun'] = $stmt5->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->query("SELECT DISTINCT status_kerja FROM dim_status ORDER BY status_kerja");
+    $dims['status'] = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'status_kerja');
 
-    echo json_encode(["status" => "success", "data" => $results]);
+    $stmt = $pdo->query("SELECT DISTINCT range_pendapatan FROM dim_pendapatan ORDER BY range_pendapatan");
+    $dims['pendapatan'] = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'range_pendapatan');
+
+    // 3. Summary statistics
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM fact_serapan_kerja");
+    $total = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+    $stmt = $pdo->query("SELECT ROUND(AVG(lama_tunggu_bulan), 1) as avg_tunggu FROM fact_serapan_kerja");
+    $avgTunggu = $stmt->fetch(PDO::FETCH_ASSOC)['avg_tunggu'];
+
+    echo json_encode([
+        "status" => "success",
+        "data" => [
+            "alumni" => $alumni,
+            "dimensions" => $dims,
+            "summary" => [
+                "total_alumni" => (int)$total,
+                "rata_rata_tunggu" => (float)($avgTunggu ?? 0)
+            ]
+        ]
+    ]);
 } catch (PDOException $e) {
     echo json_encode(["status" => "error", "message" => "Database error: " . $e->getMessage()]);
 }
