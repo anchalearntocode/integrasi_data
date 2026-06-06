@@ -1,12 +1,8 @@
 <?php
-// ============================================================
-// api.php - REST API Data Warehouse Serapan Kerja Alumni
-// ============================================================
-
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Access-Control-Allow-Headers: Content-Type, X-API-KEY, X-Requested-With");
 
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
@@ -15,11 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 
 require_once "db.php";
 
-// ============================================================
-// HELPER
-// ============================================================
-
-function json_response($status, $data = null, $message = "", $total = null, $code = 200) {
+function json_response($status, $data = null, $message = "", $total = null, $code = 200, $pagination = null) {
     http_response_code($code);
 
     $response = [
@@ -30,6 +22,10 @@ function json_response($status, $data = null, $message = "", $total = null, $cod
 
     if ($total !== null) {
         $response["total"] = $total;
+    }
+
+    if ($pagination !== null) {
+        $response["pagination"] = $pagination;
     }
 
     echo json_encode($response);
@@ -47,82 +43,45 @@ function get_json_body() {
     return $data;
 }
 
-function get_bearer_token() {
+function get_api_key() {
     $headers = getallheaders();
 
-    if (!isset($headers["Authorization"])) {
-        return null;
-    }
-
-    if (preg_match('/Bearer\s(\S+)/', $headers["Authorization"], $matches)) {
-        return $matches[1];
+    foreach ($headers as $key => $value) {
+        if (strtolower($key) === "x-api-key") {
+            return trim($value);
+        }
     }
 
     return null;
 }
 
 function validate_api_key($pdo) {
-    $token = get_bearer_token();
+    $apiKey = get_api_key();
 
-    if (!$token) {
-        json_response("error", null, "API Key tidak ditemukan.", null, 401);
+    if (!$apiKey) {
+        json_response("error", null, "API Key tidak ditemukan. Silakan login terlebih dahulu.", null, 401);
     }
 
-    $stmt = $pdo->prepare("SELECT id, username, role FROM users WHERE api_key = ?");
-    $stmt->execute([$token]);
+    $stmt = $pdo->prepare("
+        SELECT id, username
+        FROM users
+        WHERE api_key = ?
+    ");
+    $stmt->execute([$apiKey]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
-        json_response("error", null, "API Key tidak valid.", null, 401);
+        json_response("error", null, "API Key tidak valid atau sesi login sudah berakhir.", null, 401);
     }
 
     return $user;
 }
 
-function get_or_create($pdo, $selectSql, $selectParams, $insertSql, $insertParams) {
-    $stmt = $pdo->prepare($selectSql);
-    $stmt->execute($selectParams);
-    $id = $stmt->fetchColumn();
-
-    if (!$id) {
-        $stmt = $pdo->prepare($insertSql);
-        $stmt->execute($insertParams);
-        $id = $pdo->lastInsertId();
-    }
-
-    return $id;
-}
-
-// ============================================================
-// PASTIKAN TABEL USERS SUPPORT API KEY
-// ============================================================
-
-try {
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL,
-            role ENUM('admin','user') DEFAULT 'user',
-            api_key VARCHAR(255) DEFAULT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ");
-} catch (PDOException $e) {
-    json_response("error", null, "Gagal memastikan tabel users: " . $e->getMessage(), null, 500);
-}
-
-// ============================================================
-// ROUTER
-// ============================================================
-
 $method = $_SERVER["REQUEST_METHOD"];
 $resource = $_GET["resource"] ?? "";
 $action = $_GET["action"] ?? "";
 
-// ============================================================
-// AUTH
-// ============================================================
+// ================= AUTH =================
 
 if ($resource === "auth") {
     if ($method !== "POST") {
@@ -138,18 +97,17 @@ if ($resource === "auth") {
 
         $username = htmlspecialchars(strip_tags($data->username));
         $hash = password_hash($data->password, PASSWORD_BCRYPT);
-        $role = $data->role ?? "user";
 
         try {
             $stmt = $pdo->prepare("
-                INSERT INTO users (username, password, role)
-                VALUES (?, ?, ?)
+                INSERT INTO users (username, password)
+                VALUES (?, ?)
             ");
-            $stmt->execute([$username, $hash, $role]);
+            $stmt->execute([$username, $hash]);
 
             json_response("success", null, "Registrasi berhasil.");
         } catch (PDOException $e) {
-            if ($e->errorInfo[1] == 1062) {
+            if (isset($e->errorInfo[1]) && $e->errorInfo[1] == 1062) {
                 json_response("error", null, "Username sudah digunakan.", null, 409);
             }
 
@@ -165,7 +123,7 @@ if ($resource === "auth") {
         $username = htmlspecialchars(strip_tags($data->username));
 
         $stmt = $pdo->prepare("
-            SELECT id, username, password, role, api_key
+            SELECT id, username, password
             FROM users
             WHERE username = ?
         ");
@@ -180,23 +138,18 @@ if ($resource === "auth") {
             json_response("error", null, "Password salah.", null, 401);
         }
 
-        if (empty($user["api_key"])) {
-            $apiKey = bin2hex(random_bytes(32));
+        $apiKey = bin2hex(random_bytes(32));
 
-            $stmt = $pdo->prepare("
-                UPDATE users
-                SET api_key = ?
-                WHERE id = ?
-            ");
-            $stmt->execute([$apiKey, $user["id"]]);
-        } else {
-            $apiKey = $user["api_key"];
-        }
+        $stmt = $pdo->prepare("
+            UPDATE users
+            SET api_key = ?
+            WHERE id = ?
+        ");
+        $stmt->execute([$apiKey, $user["id"]]);
 
         json_response("success", [
             "id" => $user["id"],
             "username" => $user["username"],
-            "role" => $user["role"],
             "api_key" => $apiKey
         ], "Login berhasil.");
     }
@@ -222,13 +175,69 @@ if ($resource === "auth") {
     json_response("error", null, "Action auth tidak valid.", null, 400);
 }
 
-// ============================================================
-// ALUMNI
-// ============================================================
+// Semua resource data wajib API Key
+if (in_array($resource, ["alumni", "dashboard", "serapan", "dimensi"])) {
+    validate_api_key($pdo);
+}
+
+// ================= ALUMNI + PAGINATION =================
 
 if ($resource === "alumni") {
     if ($method === "GET") {
-        $query = "
+        $page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
+        $limit = isset($_GET["limit"]) ? (int) $_GET["limit"] : 10;
+
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        if ($limit < 1) {
+            $limit = 10;
+        }
+
+        if ($limit > 100) {
+            $limit = 100;
+        }
+
+        $offset = ($page - 1) * $limit;
+
+        $baseFrom = "
+            FROM fact_serapan_kerja f
+            JOIN dim_alumni a ON f.id_alumni = a.id_alumni
+            JOIN dim_tahun t ON a.id_tahun = t.id_tahun
+            JOIN dim_prodi p ON f.id_prodi = p.id_prodi
+            JOIN dim_status s ON f.id_status = s.id_status
+            JOIN dim_instansi i ON f.id_instansi = i.id_instansi
+            JOIN dim_kota k ON i.id_kota = k.id_kota
+            JOIN dim_pendapatan pd ON f.id_pendapatan = pd.id_pendapatan
+            WHERE 1=1
+        ";
+
+        $whereParams = [];
+
+        if (!empty($_GET["tahun"])) {
+            $baseFrom .= " AND t.tahun_lulus = ?";
+            $whereParams[] = $_GET["tahun"];
+        }
+
+        if (!empty($_GET["prodi"])) {
+            $baseFrom .= " AND p.nama_prodi = ?";
+            $whereParams[] = $_GET["prodi"];
+        }
+
+        if (!empty($_GET["status"])) {
+            $baseFrom .= " AND s.status_kerja = ?";
+            $whereParams[] = $_GET["status"];
+        }
+
+        $countQuery = "SELECT COUNT(*) AS total_data " . $baseFrom;
+        $countStmt = $pdo->prepare($countQuery);
+        $countStmt->execute($whereParams);
+        $totalData = (int) $countStmt->fetchColumn();
+
+        $totalPages = $totalData > 0 ? ceil($totalData / $limit) : 1;
+
+        $dataQuery = "
             SELECT
                 f.id_fact,
                 a.kode_alumni,
@@ -244,49 +253,41 @@ if ($resource === "alumni") {
                 pd.range_pendapatan,
                 f.jumlah_alumni,
                 f.lama_tunggu_bulan
-            FROM fact_serapan_kerja f
-            JOIN dim_alumni a ON f.id_alumni = a.id_alumni
-            JOIN dim_tahun t ON a.id_tahun = t.id_tahun
-            JOIN dim_prodi p ON f.id_prodi = p.id_prodi
-            JOIN dim_status s ON f.id_status = s.id_status
-            JOIN dim_instansi i ON f.id_instansi = i.id_instansi
-            JOIN dim_kota k ON i.id_kota = k.id_kota
-            JOIN dim_pendapatan pd ON f.id_pendapatan = pd.id_pendapatan
-            WHERE 1=1
+            " . $baseFrom . "
+            ORDER BY f.id_fact DESC
+            LIMIT ? OFFSET ?
         ";
 
-        $params = [];
+        $dataParams = $whereParams;
+        $dataParams[] = $limit;
+        $dataParams[] = $offset;
 
-        if (!empty($_GET["tahun"])) {
-            $query .= " AND t.tahun_lulus = ?";
-            $params[] = $_GET["tahun"];
+        $stmt = $pdo->prepare($dataQuery);
+
+        foreach ($dataParams as $index => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue($index + 1, $value, $paramType);
         }
 
-        if (!empty($_GET["prodi"])) {
-            $query .= " AND p.nama_prodi = ?";
-            $params[] = $_GET["prodi"];
-        }
-
-        if (!empty($_GET["status"])) {
-            $query .= " AND s.status_kerja = ?";
-            $params[] = $_GET["status"];
-        }
-
-        $query .= " ORDER BY f.id_fact DESC";
-
-        $stmt = $pdo->prepare($query);
-        $stmt->execute($params);
+        $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        json_response("success", $rows, "Data alumni berhasil diambil.", count($rows));
+        $pagination = [
+            "page" => $page,
+            "limit" => $limit,
+            "total_data" => $totalData,
+            "total_pages" => $totalPages,
+            "has_previous" => $page > 1,
+            "has_next" => $page < $totalPages
+        ];
+
+        json_response("success", $rows, "Data alumni berhasil diambil.", count($rows), 200, $pagination);
     }
 
     json_response("error", null, "Method alumni tidak didukung.", null, 405);
 }
 
-// ============================================================
-// DASHBOARD
-// ============================================================
+// ================= DASHBOARD =================
 
 if ($resource === "dashboard") {
     if ($method !== "GET") {
@@ -350,9 +351,7 @@ if ($resource === "dashboard") {
     json_response("success", $data, "Data dashboard berhasil diambil.");
 }
 
-// ============================================================
-// SERAPAN
-// ============================================================
+// ================= SERAPAN =================
 
 if ($resource === "serapan") {
     if ($method !== "GET") {
@@ -417,9 +416,7 @@ if ($resource === "serapan") {
     json_response("error", null, "Action serapan tidak valid.", null, 400);
 }
 
-// ============================================================
-// DIMENSI
-// ============================================================
+// ================= DIMENSI =================
 
 if ($resource === "dimensi") {
     if ($method !== "GET") {

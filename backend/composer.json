@@ -1,0 +1,12 @@
+{
+    "name": "all/backend",
+    "authors": [
+        {
+            "name": "rizldy",
+            "email": "afdrizaldy37@gmail.com"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.7"
+    }
+}

@@ -1362,3 +1362,72 @@ select.form-control option {
     box-shadow: none;
   }
 }
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 16px 0 4px;
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.api-key-box {
+  margin-bottom: 24px;
+  padding: 20px;
+}
+
+.api-key-value {
+  margin-top: 10px;
+  word-break: break-all;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table-data {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.table-data th {
+  padding: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-data td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.empty-row {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
