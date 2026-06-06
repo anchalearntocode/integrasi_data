@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Input Data — DataAlumni</title>
+    <title>Edit Data — Data Alumni</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap"
@@ -12,52 +12,38 @@
     <style>
       :root {
         --bg: #080d17;
-        --bg-1: #0d1526;
-        --bg-2: #101e34;
-        --surface: rgba(13, 21, 38, 0.8);
-        --surface-2: rgba(16, 30, 52, 0.7);
-        --border: rgba(99, 179, 237, 0.12);
-        --border-2: rgba(99, 179, 237, 0.22);
-
+        --surface: rgba(13, 21, 38, 0.86);
+        --border: rgba(99, 179, 237, 0.14);
+        --border-2: rgba(99, 179, 237, 0.25);
         --cyan: #38bdf8;
-        --cyan-dim: #7dd3fc;
         --blue: #3b82f6;
-        --blue-dark: #1d4ed8;
-
         --text: #e2eaf6;
         --text-2: #94a9c4;
         --text-3: #5b7294;
-
         --green: #34d399;
         --red: #f87171;
-        --amber: #fbbf24;
-
         --sidebar-w: 256px;
         --r-xl: 22px;
         --r-lg: 16px;
         --r-md: 12px;
         --shadow: 0 24px 60px rgba(2, 8, 20, 0.5);
-
         --font-body: "Plus Jakarta Sans", sans-serif;
         --font-display: "Syne", sans-serif;
       }
 
-      *,
-      *::before,
-      *::after {
+      * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
-      html {
-        scroll-behavior: smooth;
-      }
+
       body {
         font-family: var(--font-body);
         background: var(--bg);
         color: var(--text);
         min-height: 100vh;
       }
+
       body::before {
         content: "";
         position: fixed;
@@ -65,16 +51,15 @@
         background:
           radial-gradient(
             ellipse 70% 50% at 20% -10%,
-            rgba(56, 189, 248, 0.08) 0%,
-            transparent 50%
+            rgba(56, 189, 248, 0.08),
+            transparent 55%
           ),
           radial-gradient(
             ellipse 50% 40% at 80% 110%,
-            rgba(59, 130, 246, 0.07) 0%,
-            transparent 50%
+            rgba(59, 130, 246, 0.07),
+            transparent 55%
           );
         pointer-events: none;
-        z-index: 0;
       }
 
       .layout-wrapper {
@@ -84,7 +69,6 @@
         z-index: 1;
       }
 
-      /* SIDEBAR */
       .sidebar {
         width: var(--sidebar-w);
         background: rgba(8, 13, 23, 0.96);
@@ -97,6 +81,7 @@
         top: 0;
         height: 100vh;
       }
+
       .sidebar-logo {
         text-decoration: none;
         display: flex;
@@ -106,11 +91,11 @@
         font-size: 1.25rem;
         font-weight: 800;
         color: var(--cyan);
-        letter-spacing: -0.03em;
         padding: 0 10px 24px;
         border-bottom: 1px solid var(--border);
         margin-bottom: 12px;
       }
+
       .sidebar-logo-icon {
         width: 32px;
         height: 32px;
@@ -119,9 +104,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
-        flex-shrink: 0;
       }
+
       .sidebar-section-label {
         font-size: 0.68rem;
         font-weight: 700;
@@ -130,6 +114,7 @@
         padding: 10px 12px 6px;
         text-transform: uppercase;
       }
+
       .nav-link {
         text-decoration: none;
         color: var(--text-2);
@@ -140,133 +125,88 @@
         gap: 10px;
         font-weight: 600;
         font-size: 0.88rem;
-        transition: 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-        position: relative;
-        overflow: hidden;
+        transition: 0.22s ease;
       }
-      .nav-link .nav-icon {
+
+      .nav-icon {
         width: 30px;
         height: 30px;
         border-radius: 9px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
-        flex-shrink: 0;
         background: rgba(255, 255, 255, 0.04);
-        transition: 0.22s ease;
       }
-      .nav-link:hover {
-        color: var(--text);
-        background: rgba(99, 179, 237, 0.07);
-      }
-      .nav-link:hover .nav-icon {
-        background: rgba(56, 189, 248, 0.12);
-      }
+
+      .nav-link:hover,
       .nav-link.active {
-        color: var(--cyan-dim);
-        background: linear-gradient(
-          135deg,
-          rgba(56, 189, 248, 0.13),
-          rgba(59, 130, 246, 0.09)
-        );
-        border: 1px solid rgba(56, 189, 248, 0.18);
+        color: var(--text);
+        background: rgba(56, 189, 248, 0.1);
       }
-      .nav-link.active .nav-icon {
-        background: rgba(56, 189, 248, 0.18);
-        color: var(--cyan);
-      }
-      .nav-link.active::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 20%;
-        bottom: 20%;
-        width: 3px;
-        background: var(--cyan);
-        border-radius: 0 4px 4px 0;
-      }
+
       .nav-link.nav-logout {
         margin-top: auto;
         color: #fda4af;
       }
-      .nav-link.nav-logout:hover {
-        color: #fecdd3;
-        background: rgba(251, 113, 133, 0.1);
-      }
-      .nav-link.nav-logout .nav-icon {
-        background: rgba(251, 113, 133, 0.08);
-      }
 
-      /* MAIN */
       .main-content {
         flex: 1;
         padding: 36px 40px;
-        min-width: 0;
       }
 
       .page-header {
         margin-bottom: 28px;
       }
-      .page-breadcrumb {
-        font-size: 0.78rem;
-        color: var(--text-3);
-        margin-bottom: 6px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .page-breadcrumb span {
-        color: var(--cyan-dim);
-      }
+
       .page-title {
         font-family: var(--font-display);
         font-size: clamp(1.6rem, 2.5vw, 2.2rem);
         font-weight: 800;
-        color: var(--text);
-        letter-spacing: -0.04em;
       }
+
       .page-subtitle {
         color: var(--text-2);
         font-size: 0.9rem;
         margin-top: 6px;
       }
 
-      /* CARD */
       .card {
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: var(--r-xl);
         backdrop-filter: blur(18px);
         padding: 32px;
-        max-width: 860px;
+        max-width: 900px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow);
       }
 
-      /* FORM SECTIONS */
       .form-section {
         margin-bottom: 28px;
         padding-bottom: 28px;
         border-bottom: 1px solid var(--border);
       }
+
       .form-section:last-of-type {
         border-bottom: 0;
         margin-bottom: 0;
         padding-bottom: 0;
       }
+
       .form-section-title {
         font-size: 0.78rem;
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        color: var(--cyan-dim);
+        color: #7dd3fc;
         margin-bottom: 18px;
         display: flex;
         align-items: center;
         gap: 8px;
       }
+
       .form-section-title::before {
         content: "";
-        display: block;
         width: 3px;
         height: 14px;
         background: var(--cyan);
@@ -278,9 +218,6 @@
         grid-template-columns: 1fr 1fr;
         gap: 16px;
       }
-      .form-group {
-        margin-bottom: 0;
-      }
 
       .form-label {
         display: block;
@@ -288,49 +225,39 @@
         font-weight: 600;
         color: var(--text-2);
         margin-bottom: 8px;
-        letter-spacing: 0.02em;
-      }
-      .form-label .required {
-        color: var(--red);
-        margin-left: 2px;
       }
 
-      /* Input wrapper with floating label effect */
-      .input-wrap {
-        position: relative;
+      .required {
+        color: var(--red);
       }
+
       .form-control {
         width: 100%;
         padding: 12px 14px;
         border: 1px solid var(--border);
         border-radius: var(--r-md);
-        background: rgba(8, 13, 23, 0.7);
+        background: rgba(8, 13, 23, 0.72);
         color: var(--text);
         font-family: var(--font-body);
         font-size: 0.88rem;
         outline: none;
         transition: 0.2s ease;
       }
+
       .form-control:focus {
         border-color: var(--cyan);
         box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
-        background: rgba(8, 13, 23, 0.9);
       }
+
       .form-control::placeholder {
         color: var(--text-3);
       }
-      .form-control:valid:not(:placeholder-shown) {
-        border-color: rgba(52, 211, 153, 0.35);
-      }
-      select.form-control {
-        cursor: pointer;
-      }
+
       select.form-control option {
         background: #0d1526;
         color: var(--text);
       }
 
-      /* ALERT */
       .alert {
         display: none;
         padding: 13px 16px;
@@ -338,136 +265,140 @@
         margin-bottom: 24px;
         font-size: 0.88rem;
         font-weight: 600;
-        animation: slideIn 0.3s ease;
       }
+
       .alert-error {
         background: rgba(248, 113, 113, 0.08);
         border: 1px solid rgba(248, 113, 113, 0.22);
         color: #fca5a5;
       }
+
       .alert-success {
         background: rgba(52, 211, 153, 0.08);
         border: 1px solid rgba(52, 211, 153, 0.22);
         color: #6ee7b7;
       }
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(-8px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+
+      .alert-info {
+        background: rgba(56, 189, 248, 0.08);
+        border: 1px solid rgba(56, 189, 248, 0.22);
+        color: #7dd3fc;
       }
 
-      /* SUBMIT BUTTON */
-      .btn-wrap {
-        padding-top: 8px;
+      .etl-desc {
+        color: var(--text-2);
+        font-size: 0.88rem;
+        line-height: 1.7;
+        margin-bottom: 20px;
       }
+
+      .etl-points {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      .etl-point {
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        background: rgba(8, 13, 23, 0.42);
+      }
+
+      .etl-point strong {
+        display: block;
+        font-size: 0.86rem;
+        margin-bottom: 4px;
+      }
+
+      .etl-point span {
+        color: var(--text-3);
+        font-size: 0.76rem;
+        line-height: 1.5;
+      }
+
+      .file-hint {
+        margin-top: 10px;
+        color: var(--text-3);
+        font-size: 0.8rem;
+        line-height: 1.6;
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
       .btn {
-        width: 100%;
         padding: 14px 20px;
         border: 0;
         border-radius: var(--r-lg);
         font-family: var(--font-body);
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         font-weight: 700;
         cursor: pointer;
-        transition: 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-        display: flex;
+        transition: 0.22s ease;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
+        width: 100%;
       }
+
       .btn-primary {
-        background: linear-gradient(135deg, var(--cyan) 0%, var(--blue) 100%);
-        color: #fff;
+        background: linear-gradient(135deg, var(--cyan), var(--blue));
+        color: white;
         box-shadow: 0 8px 28px rgba(56, 189, 248, 0.22);
       }
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 14px 36px rgba(56, 189, 248, 0.3);
-        filter: brightness(1.06);
+
+      .btn-secondary {
+        background: rgba(148, 169, 196, 0.12);
+        color: var(--text);
+        border: 1px solid var(--border);
       }
-      .btn-primary:disabled {
-        opacity: 0.5;
+
+      .btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.05);
+      }
+
+      .btn:disabled {
+        opacity: 0.55;
         cursor: not-allowed;
         transform: none;
       }
-      .btn-primary:active {
-        transform: translateY(0);
-      }
 
-      /* PROGRESS INDICATOR */
-      .form-progress {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 28px;
-        align-items: center;
-      }
-      .progress-step {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--text-3);
-      }
-      .progress-dot {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.7rem;
-        font-weight: 800;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid var(--border);
-        color: var(--text-3);
-        transition: 0.2s ease;
-      }
-      .progress-dot.active {
-        background: rgba(56, 189, 248, 0.15);
-        border-color: var(--cyan);
-        color: var(--cyan);
-      }
-      .progress-line {
-        flex: 1;
-        height: 1px;
-        background: var(--border);
-      }
-
-      /* TOAST */
       .toast {
         position: fixed;
         right: 24px;
         bottom: 24px;
         background: rgba(8, 13, 23, 0.96);
         border: 1px solid var(--border-2);
-        color: var(--cyan-dim);
+        color: #7dd3fc;
         padding: 13px 18px;
         border-radius: var(--r-lg);
         box-shadow: var(--shadow);
         opacity: 0;
         transform: translateY(14px);
         pointer-events: none;
-        transition: 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: 0.28s ease;
         z-index: 9999;
         font-size: 0.88rem;
         font-weight: 600;
       }
+
       .toast.show {
         opacity: 1;
         transform: translateY(0);
       }
 
-      /* RESPONSIVE */
       @media (max-width: 980px) {
         .layout-wrapper {
           flex-direction: column;
         }
+
         .sidebar {
           width: 100%;
           height: auto;
@@ -476,100 +407,185 @@
           flex-wrap: wrap;
           padding: 16px;
         }
+
         .sidebar-logo {
           border-bottom: none;
           padding-bottom: 0;
           margin-bottom: 0;
         }
+
         .sidebar-section-label {
           display: none;
         }
+
         .nav-link.nav-logout {
           margin-top: 0;
         }
+
         .main-content {
           padding: 24px 20px;
         }
       }
+
       @media (max-width: 640px) {
-        .two-col-grid {
+        .two-col-grid,
+        .etl-points {
           grid-template-columns: 1fr;
         }
+
+        .btn-row {
+          flex-direction: column;
+        }
+
         .card {
           padding: 22px 18px;
         }
+
         .main-content {
           padding: 18px 14px;
         }
       }
     </style>
   </head>
+
   <body>
     <div class="layout-wrapper">
-      <!-- SIDEBAR -->
       <aside class="sidebar">
         <a href="dashboard.html" class="sidebar-logo">
           <div class="sidebar-logo-icon">◈</div>
           Data Alumni
         </a>
+
         <div class="sidebar-section-label">Navigasi</div>
+
         <a href="dashboard.html" class="nav-link">
           <div class="nav-icon">📊</div>
           Dashboard
         </a>
+
         <a href="data.html" class="nav-link">
           <div class="nav-icon">🗄️</div>
           Data Alumni
         </a>
+
         <a href="input.html" class="nav-link active">
           <div class="nav-icon">✏️</div>
-          Input Data
+          Edit Data
         </a>
+
         <a href="#" class="nav-link nav-logout" onclick="logout()">
           <div class="nav-icon">🚪</div>
           Logout
         </a>
       </aside>
 
-      <!-- MAIN -->
       <main class="main-content">
         <div class="page-header">
-          <h1 class="page-title">Input Data Alumni</h1>
+          <h1 class="page-title">Import & Edit Data Alumni</h1>
           <p class="page-subtitle">
-            Tambahkan data survei tracer study alumni baru ke sistem.
+            Import data tracer study melalui Excel/CSV atau edit data alumni
+            yang sudah tersimpan di Data Warehouse.
           </p>
         </div>
 
         <div class="card">
-          <div id="form-alert" class="alert"></div>
+          <div class="form-section-title">Import Excel ETL</div>
 
-          <!-- Progress indicator -->
-          <div class="form-progress">
-            <div class="progress-step">
-              <div class="progress-dot active">1</div>
-              <span>Identitas</span>
+          <p class="etl-desc">
+            Gunakan fitur ini untuk mengunggah file Excel/CSV data alumni.
+            Sistem akan melakukan mapping kolom, cleaning data, normalisasi
+            nilai kosong, lalu memuat data ke tabel dimensi dan fact.
+          </p>
+
+          <div class="etl-points">
+            <div class="etl-point">
+              <strong>1. Extract</strong>
+              <span>Membaca file .xlsx, .xls, atau .csv.</span>
             </div>
-            <div class="progress-line"></div>
-            <div class="progress-step">
-              <div class="progress-dot active">2</div>
-              <span>Pekerjaan</span>
+            <div class="etl-point">
+              <strong>2. Transform</strong>
+              <span>Membersihkan dan menyesuaikan data alumni.</span>
             </div>
-            <div class="progress-line"></div>
-            <div class="progress-step">
-              <div class="progress-dot active">3</div>
-              <span>Detail</span>
+            <div class="etl-point">
+              <strong>3. Load</strong>
+              <span>Menyimpan data ke Data Warehouse.</span>
             </div>
           </div>
 
+          <div id="import-alert" class="alert"></div>
+
+          <form id="form-import-excel" enctype="multipart/form-data">
+            <div class="form-section">
+              <label class="form-label">
+                Upload File Excel Alumni <span class="required">*</span>
+              </label>
+              <input
+                type="file"
+                id="excel-file"
+                class="form-control"
+                accept=".xlsx,.xls,.csv"
+                required
+              />
+              <p class="file-hint">
+                Kolom tambahan akan diabaikan. Kolom yang sesuai akan dipetakan
+                otomatis ke struktur DW.
+              </p>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <span>📥</span>
+              <span>Import Excel ETL</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="form-section-title">Edit Data Alumni</div>
+
+          <div id="form-alert" class="alert"></div>
+
+          <div class="form-section">
+            <div class="two-col-grid">
+              <div>
+                <label class="form-label">
+                  ID Fact <span class="required">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="id_fact"
+                  class="form-control"
+                  placeholder="Contoh: 15"
+                  required
+                />
+              </div>
+
+              <div style="display: flex; align-items: end">
+                <button
+                  type="button"
+                  id="btn-load-data"
+                  class="btn btn-secondary"
+                >
+                  <span>🔍</span>
+                  <span>Cari Data</span>
+                </button>
+              </div>
+            </div>
+
+            <p class="file-hint">
+              ID Fact bisa dilihat dari halaman Data Alumni pada kolom
+              <b>id_fact</b>.
+            </p>
+          </div>
+
           <form id="form-alumni">
-            <!-- SECTION 1: Identitas -->
             <div class="form-section">
               <div class="form-section-title">Identitas Alumni</div>
+
               <div class="two-col-grid">
-                <div class="form-group">
-                  <label class="form-label"
-                    >Kode Responden Asli <span class="required">*</span></label
-                  >
+                <div>
+                  <label class="form-label">
+                    Kode Responden Asli <span class="required">*</span>
+                  </label>
                   <input
                     type="text"
                     id="kode_responden_asli"
@@ -578,10 +594,11 @@
                     required
                   />
                 </div>
-                <div class="form-group">
-                  <label class="form-label"
-                    >Tahun Lulus <span class="required">*</span></label
-                  >
+
+                <div>
+                  <label class="form-label">
+                    Tahun Lulus <span class="required">*</span>
+                  </label>
                   <input
                     type="number"
                     id="tahun_lulus"
@@ -590,22 +607,24 @@
                     required
                   />
                 </div>
-                <div class="form-group">
-                  <label class="form-label"
-                    >Program Studi <span class="required">*</span></label
-                  >
+
+                <div>
+                  <label class="form-label">
+                    Program Studi <span class="required">*</span>
+                  </label>
                   <input
                     type="text"
                     id="nama_prodi"
                     class="form-control"
-                    placeholder="Contoh: TKJ"
+                    placeholder="Contoh: TKJ atau TMJ"
                     required
                   />
                 </div>
-                <div class="form-group">
-                  <label class="form-label"
-                    >Jenjang <span class="required">*</span></label
-                  >
+
+                <div>
+                  <label class="form-label">
+                    Jenjang <span class="required">*</span>
+                  </label>
                   <select id="jenjang" class="form-control" required>
                     <option value="" disabled selected>Pilih Jenjang</option>
                     <option value="D3">D3</option>
@@ -613,29 +632,27 @@
                     <option value="S1">S1</option>
                   </select>
                 </div>
-                <div class="form-group" style="grid-column: 1 / -1">
-                  <label class="form-label"
-                    >Jurusan <span class="required">*</span></label
-                  >
+
+                <div style="grid-column: 1 / -1">
+                  <label class="form-label">Jurusan</label>
                   <input
                     type="text"
                     id="jurusan"
                     class="form-control"
-                    placeholder="Contoh: Teknik Informatika dan Komputer"
-                    required
+                    placeholder="Teknik Informatika dan Komputer"
                   />
                 </div>
               </div>
             </div>
 
-            <!-- SECTION 2: Pekerjaan -->
             <div class="form-section">
               <div class="form-section-title">Informasi Pekerjaan</div>
+
               <div class="two-col-grid">
-                <div class="form-group">
-                  <label class="form-label"
-                    >Status Kerja <span class="required">*</span></label
-                  >
+                <div>
+                  <label class="form-label">
+                    Status Kerja <span class="required">*</span>
+                  </label>
                   <select id="status_kerja" class="form-control" required>
                     <option value="" disabled selected>
                       Pilih Status Kerja
@@ -648,20 +665,21 @@
                     <option value="Belum Bekerja">Belum Bekerja</option>
                   </select>
                 </div>
-                <div class="form-group">
+
+                <div>
                   <label class="form-label">Jenis Pekerjaan</label>
                   <input
                     type="text"
                     id="jenis_pekerjaan"
                     class="form-control"
-                    placeholder="Contoh: Full Time, Part Time"
+                    placeholder="Contoh: Full Time"
                   />
                 </div>
-                <div class="form-group">
-                  <label class="form-label"
-                    >Kategori Instansi / Perusahaan
-                    <span class="required">*</span></label
-                  >
+
+                <div>
+                  <label class="form-label">
+                    Kategori Instansi <span class="required">*</span>
+                  </label>
                   <input
                     type="text"
                     id="kategori_instansi"
@@ -670,26 +688,27 @@
                     required
                   />
                 </div>
-                <div class="form-group">
+
+                <div>
                   <label class="form-label">Jenis Lembaga</label>
                   <input
                     type="text"
                     id="jenis_lembaga"
                     class="form-control"
-                    placeholder="Contoh: Perusahaan, Instansi Pemerintah"
+                    placeholder="Contoh: Perusahaan"
                   />
                 </div>
               </div>
             </div>
 
-            <!-- SECTION 3: Detail -->
             <div class="form-section">
-              <div class="form-section-title">Detail Ekonomi &amp; Lokasi</div>
+              <div class="form-section-title">Detail Ekonomi & Lokasi</div>
+
               <div class="two-col-grid">
-                <div class="form-group">
-                  <label class="form-label"
-                    >Range Pendapatan <span class="required">*</span></label
-                  >
+                <div>
+                  <label class="form-label">
+                    Range Pendapatan <span class="required">*</span>
+                  </label>
                   <select id="range_pendapatan" class="form-control" required>
                     <option value="" disabled selected>Pilih Pendapatan</option>
                     <option value="< Rp 2 Juta">&lt; Rp 2 Juta</option>
@@ -702,10 +721,11 @@
                     </option>
                   </select>
                 </div>
-                <div class="form-group">
-                  <label class="form-label"
-                    >Lama Tunggu (Bulan) <span class="required">*</span></label
-                  >
+
+                <div>
+                  <label class="form-label">
+                    Lama Tunggu Bulan <span class="required">*</span>
+                  </label>
                   <input
                     type="number"
                     id="lama_tunggu_bulan"
@@ -714,10 +734,11 @@
                     required
                   />
                 </div>
-                <div class="form-group" style="grid-column: 1 / -1">
-                  <label class="form-label"
-                    >Kota / Lokasi Kerja <span class="required">*</span></label
-                  >
+
+                <div style="grid-column: 1 / -1">
+                  <label class="form-label">
+                    Kota / Lokasi Kerja <span class="required">*</span>
+                  </label>
                   <input
                     type="text"
                     id="nama_kota"
@@ -729,9 +750,19 @@
               </div>
             </div>
 
-            <div class="btn-wrap">
+            <div class="btn-row">
               <button type="submit" class="btn btn-primary">
-                <span>💾</span> <span>Simpan Data Alumni</span>
+                <span>💾</span>
+                <span>Update Data Alumni</span>
+              </button>
+
+              <button
+                type="button"
+                id="btn-reset-form"
+                class="btn btn-secondary"
+              >
+                <span>↺</span>
+                <span>Reset Form</span>
               </button>
             </div>
           </form>
@@ -741,81 +772,261 @@
 
     <div id="toast" class="toast"></div>
 
-    <script src="js/app.js?v=700"></script>
+    <script src="js/app.js?v=801"></script>
     <script>
       checkAuth();
+
+      const API_URL = "/data_warehouse/backend/alumni.php";
+
+      function getApiKey() {
+        return localStorage.getItem("api_key");
+      }
+
+      function showAlert(elementId, type, message) {
+        const alertEl = document.getElementById(elementId);
+        alertEl.style.display = "block";
+        alertEl.className = `alert alert-${type}`;
+        alertEl.textContent = message;
+
+        setTimeout(() => {
+          alertEl.style.display = "none";
+        }, 5000);
+      }
+
+      function setButtonLoading(button, loadingText, isLoading) {
+        if (isLoading) {
+          button.dataset.originalText = button.innerHTML;
+          button.innerHTML = loadingText;
+          button.disabled = true;
+        } else {
+          button.innerHTML = button.dataset.originalText;
+          button.disabled = false;
+        }
+      }
+
+      function fillForm(data) {
+        document.getElementById("id_fact").value = data.id_fact || "";
+        document.getElementById("kode_responden_asli").value =
+          data.kode_responden_asli || "";
+        document.getElementById("tahun_lulus").value = data.tahun_lulus || "";
+        document.getElementById("nama_prodi").value = data.nama_prodi || "";
+        document.getElementById("jenjang").value = data.jenjang || "";
+        document.getElementById("jurusan").value =
+          data.jurusan || "Teknik Informatika dan Komputer";
+        document.getElementById("status_kerja").value = data.status_kerja || "";
+        document.getElementById("jenis_pekerjaan").value =
+          data.jenis_pekerjaan || "";
+        document.getElementById("kategori_instansi").value =
+          data.kategori_instansi || "";
+        document.getElementById("jenis_lembaga").value =
+          data.jenis_lembaga || "";
+        document.getElementById("range_pendapatan").value =
+          data.range_pendapatan || "";
+        document.getElementById("lama_tunggu_bulan").value =
+          data.lama_tunggu_bulan || 0;
+        document.getElementById("nama_kota").value = data.nama_kota || "";
+      }
+
+      function getFormData() {
+        return {
+          id_fact: document.getElementById("id_fact").value,
+          kode_responden_asli: document.getElementById("kode_responden_asli")
+            .value,
+          tahun_lulus: document.getElementById("tahun_lulus").value,
+          nama_prodi: document.getElementById("nama_prodi").value,
+          jenjang: document.getElementById("jenjang").value,
+          jurusan:
+            document.getElementById("jurusan").value ||
+            "Teknik Informatika dan Komputer",
+          status_kerja: document.getElementById("status_kerja").value,
+          jenis_pekerjaan:
+            document.getElementById("jenis_pekerjaan").value ||
+            "Tidak Diketahui",
+          kategori_instansi: document.getElementById("kategori_instansi").value,
+          jenis_lembaga:
+            document.getElementById("jenis_lembaga").value || "Tidak Diketahui",
+          range_pendapatan: document.getElementById("range_pendapatan").value,
+          lama_tunggu_bulan: document.getElementById("lama_tunggu_bulan").value,
+          nama_kota: document.getElementById("nama_kota").value,
+        };
+      }
+
+      document
+        .getElementById("form-import-excel")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const apiKey = getApiKey();
+          const fileInput = document.getElementById("excel-file");
+          const button = this.querySelector('button[type="submit"]');
+
+          if (!apiKey) {
+            showAlert("import-alert", "error", "API Key tidak ditemukan.");
+            return;
+          }
+
+          if (!fileInput.files.length) {
+            showAlert("import-alert", "error", "File belum dipilih.");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("file", fileInput.files[0]);
+
+          try {
+            setButtonLoading(
+              button,
+              "<span>⏳</span><span>Mengimport...</span>",
+              true,
+            );
+
+            const response = await fetch(
+              `${API_URL}?resource=alumni&action=import_excel`,
+              {
+                method: "POST",
+                headers: {
+                  "X-API-KEY": apiKey,
+                },
+                body: formData,
+              },
+            );
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+              showAlert("import-alert", "success", result.message);
+              fileInput.value = "";
+              if (typeof showToast === "function") {
+                showToast("✅ Import Excel berhasil.");
+              }
+            } else {
+              showAlert("import-alert", "error", result.message);
+            }
+          } catch (err) {
+            console.error(err);
+            showAlert("import-alert", "error", "Gagal terhubung ke server.");
+          } finally {
+            setButtonLoading(button, "", false);
+          }
+        });
+
+      document
+        .getElementById("btn-load-data")
+        .addEventListener("click", async function () {
+          const apiKey = getApiKey();
+          const idFact = document.getElementById("id_fact").value;
+
+          if (!apiKey) {
+            showAlert("form-alert", "error", "API Key tidak ditemukan.");
+            return;
+          }
+
+          if (!idFact) {
+            showAlert(
+              "form-alert",
+              "error",
+              "Masukkan ID Fact terlebih dahulu.",
+            );
+            return;
+          }
+
+          try {
+            setButtonLoading(
+              this,
+              "<span>⏳</span><span>Mencari...</span>",
+              true,
+            );
+
+            const response = await fetch(
+              `${API_URL}?resource=alumni&id_fact=${idFact}`,
+              {
+                method: "GET",
+                headers: {
+                  "X-API-KEY": apiKey,
+                },
+              },
+            );
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+              fillForm(result.data);
+              showAlert("form-alert", "success", "Data berhasil dimuat.");
+            } else {
+              showAlert("form-alert", "error", result.message);
+            }
+          } catch (err) {
+            console.error(err);
+            showAlert("form-alert", "error", "Gagal terhubung ke server.");
+          } finally {
+            setButtonLoading(this, "", false);
+          }
+        });
+
       document
         .getElementById("form-alumni")
         .addEventListener("submit", async function (e) {
           e.preventDefault();
-          const btn = this.querySelector('button[type="submit"]');
-          const alertEl = document.getElementById("form-alert");
-          const apiKey = localStorage.getItem("api_key");
+
+          const apiKey = getApiKey();
+          const button = this.querySelector('button[type="submit"]');
+
           if (!apiKey) {
-            alertEl.style.display = "block";
-            alertEl.className = "alert alert-error";
-            alertEl.textContent =
-              "API Key tidak ditemukan. Silakan login ulang.";
+            showAlert("form-alert", "error", "API Key tidak ditemukan.");
             return;
           }
-          const btnText = btn.innerHTML;
-          btn.innerHTML = "<span>⏳</span> <span>Menyimpan...</span>";
-          btn.disabled = true;
-          const data = {
-            kode_responden_asli: document.getElementById("kode_responden_asli")
-              .value,
-            tahun_lulus: document.getElementById("tahun_lulus").value,
-            nama_prodi: document.getElementById("nama_prodi").value,
-            jenjang: document.getElementById("jenjang").value,
-            jurusan: document.getElementById("jurusan").value,
-            status_kerja: document.getElementById("status_kerja").value,
-            jenis_pekerjaan:
-              document.getElementById("jenis_pekerjaan").value || "-",
-            kategori_instansi:
-              document.getElementById("kategori_instansi").value,
-            jenis_lembaga:
-              document.getElementById("jenis_lembaga").value || "-",
-            range_pendapatan: document.getElementById("range_pendapatan").value,
-            lama_tunggu_bulan:
-              document.getElementById("lama_tunggu_bulan").value,
-            nama_kota: document.getElementById("nama_kota").value,
-          };
-          try {
-            const response = await fetch(
-              "/data_warehouse/backend/alumni.php?resource=alumni",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "X-API-KEY": apiKey,
-                },
-                body: JSON.stringify(data),
-              },
+
+          const data = getFormData();
+
+          if (!data.id_fact) {
+            showAlert(
+              "form-alert",
+              "error",
+              "ID Fact wajib diisi untuk update data.",
             );
+            return;
+          }
+
+          try {
+            setButtonLoading(
+              button,
+              "<span>⏳</span><span>Mengupdate...</span>",
+              true,
+            );
+
+            const response = await fetch(`${API_URL}?resource=alumni`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "X-API-KEY": apiKey,
+              },
+              body: JSON.stringify(data),
+            });
+
             const result = await response.json();
-            alertEl.style.display = "block";
+
             if (result.status === "success") {
-              alertEl.className = "alert alert-success";
-              alertEl.textContent = result.message;
-              this.reset();
-              if (typeof showToast === "function")
-                showToast("✅ Data alumni berhasil disimpan.");
+              showAlert("form-alert", "success", result.message);
+              if (typeof showToast === "function") {
+                showToast("✅ Data alumni berhasil diperbarui.");
+              }
             } else {
-              alertEl.className = "alert alert-error";
-              alertEl.textContent = result.message;
+              showAlert("form-alert", "error", result.message);
             }
           } catch (err) {
             console.error(err);
-            alertEl.style.display = "block";
-            alertEl.className = "alert alert-error";
-            alertEl.textContent = "Gagal terhubung ke server.";
+            showAlert("form-alert", "error", "Gagal terhubung ke server.");
           } finally {
-            btn.innerHTML = btnText;
-            btn.disabled = false;
-            setTimeout(() => {
-              alertEl.style.display = "none";
-            }, 5000);
+            setButtonLoading(button, "", false);
           }
+        });
+
+      document
+        .getElementById("btn-reset-form")
+        .addEventListener("click", function () {
+          document.getElementById("form-alumni").reset();
+          document.getElementById("id_fact").value = "";
+          showAlert("form-alert", "info", "Form berhasil dikosongkan.");
         });
     </script>
   </body>

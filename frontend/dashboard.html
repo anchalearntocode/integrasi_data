@@ -4,57 +4,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard — DataAlumni</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap"
       rel="stylesheet"
     />
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
       :root {
         --bg: #080d17;
-        --bg-1: #0d1526;
-        --bg-2: #101e34;
         --surface: rgba(13, 21, 38, 0.8);
-        --surface-2: rgba(16, 30, 52, 0.7);
         --border: rgba(99, 179, 237, 0.12);
         --border-2: rgba(99, 179, 237, 0.22);
-        --glow: rgba(56, 189, 248, 0.15);
-
         --cyan: #38bdf8;
         --cyan-dim: #7dd3fc;
         --blue: #3b82f6;
-        --blue-dark: #1d4ed8;
-
         --text: #e2eaf6;
         --text-2: #94a9c4;
         --text-3: #5b7294;
-
         --green: #34d399;
         --red: #f87171;
         --amber: #fbbf24;
-
         --sidebar-w: 256px;
         --r-xl: 22px;
         --r-lg: 16px;
         --r-md: 12px;
         --shadow: 0 24px 60px rgba(2, 8, 20, 0.5);
-        --shadow-sm: 0 8px 24px rgba(2, 8, 20, 0.35);
-
         --font-body: "Plus Jakarta Sans", sans-serif;
         --font-display: "Syne", sans-serif;
       }
 
-      *,
-      *::before,
-      *::after {
+      * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
-      html {
-        scroll-behavior: smooth;
-      }
+
       body {
         font-family: var(--font-body);
         background: var(--bg);
@@ -62,6 +50,7 @@
         min-height: 100vh;
         overflow-x: hidden;
       }
+
       body::before {
         content: "";
         position: fixed;
@@ -69,19 +58,18 @@
         background:
           radial-gradient(
             ellipse 70% 50% at 20% -10%,
-            rgba(56, 189, 248, 0.08) 0%,
+            rgba(56, 189, 248, 0.08),
             transparent 50%
           ),
           radial-gradient(
             ellipse 50% 40% at 80% 110%,
-            rgba(59, 130, 246, 0.07) 0%,
+            rgba(59, 130, 246, 0.07),
             transparent 50%
           );
         pointer-events: none;
         z-index: 0;
       }
 
-      /* ===== LAYOUT ===== */
       .layout-wrapper {
         display: flex;
         min-height: 100vh;
@@ -89,7 +77,6 @@
         z-index: 1;
       }
 
-      /* ===== SIDEBAR ===== */
       .sidebar {
         width: var(--sidebar-w);
         background: rgba(8, 13, 23, 0.96);
@@ -101,7 +88,6 @@
         position: sticky;
         top: 0;
         height: 100vh;
-        transition: 0.3s ease;
       }
 
       .sidebar-logo {
@@ -113,11 +99,11 @@
         font-size: 1.25rem;
         font-weight: 800;
         color: var(--cyan);
-        letter-spacing: -0.03em;
         padding: 0 10px 24px;
         border-bottom: 1px solid var(--border);
         margin-bottom: 12px;
       }
+
       .sidebar-logo-icon {
         width: 32px;
         height: 32px;
@@ -149,65 +135,31 @@
         gap: 10px;
         font-weight: 600;
         font-size: 0.88rem;
-        transition: 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: 0.22s ease;
         position: relative;
-        overflow: hidden;
       }
-      .nav-link .nav-icon {
+
+      .nav-icon {
         width: 30px;
         height: 30px;
         border-radius: 9px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
-        flex-shrink: 0;
         background: rgba(255, 255, 255, 0.04);
-        transition: 0.22s ease;
       }
-      .nav-link:hover {
-        color: var(--text);
-        background: rgba(99, 179, 237, 0.07);
-      }
-      .nav-link:hover .nav-icon {
-        background: rgba(56, 189, 248, 0.12);
-      }
+
+      .nav-link:hover,
       .nav-link.active {
         color: var(--cyan-dim);
-        background: linear-gradient(
-          135deg,
-          rgba(56, 189, 248, 0.13),
-          rgba(59, 130, 246, 0.09)
-        );
-        border: 1px solid rgba(56, 189, 248, 0.18);
+        background: rgba(56, 189, 248, 0.1);
       }
-      .nav-link.active .nav-icon {
-        background: rgba(56, 189, 248, 0.18);
-        color: var(--cyan);
-      }
-      .nav-link.active::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 20%;
-        bottom: 20%;
-        width: 3px;
-        background: var(--cyan);
-        border-radius: 0 4px 4px 0;
-      }
+
       .nav-link.nav-logout {
         margin-top: auto;
         color: #fda4af;
       }
-      .nav-link.nav-logout:hover {
-        color: #fecdd3;
-        background: rgba(251, 113, 133, 0.1);
-      }
-      .nav-link.nav-logout .nav-icon {
-        background: rgba(251, 113, 133, 0.08);
-      }
 
-      /* ===== MAIN ===== */
       .main-content {
         flex: 1;
         padding: 36px 40px;
@@ -219,17 +171,16 @@
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 32px;
+        gap: 16px;
       }
-      .page-breadcrumb span {
-        color: var(--cyan-dim);
-      }
+
       .page-title {
         font-family: var(--font-display);
         font-size: clamp(1.6rem, 2.5vw, 2.2rem);
         font-weight: 800;
         color: var(--text);
-        letter-spacing: -0.04em;
       }
+
       .page-subtitle {
         color: var(--text-2);
         font-size: 0.9rem;
@@ -241,38 +192,28 @@
         border: 1px solid var(--border);
         border-radius: var(--r-lg);
         padding: 10px 18px;
-        backdrop-filter: blur(12px);
         font-size: 0.82rem;
         color: var(--text-2);
-        display: flex;
-        align-items: center;
-        gap: 8px;
       }
+
       .header-date span {
         color: var(--cyan-dim);
         font-weight: 700;
       }
 
-      /* ===== CARDS ===== */
       .card {
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: var(--r-xl);
         backdrop-filter: blur(18px);
-        transition: 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         position: relative;
         overflow: hidden;
       }
-      .card:hover {
-        border-color: var(--border-2);
-        box-shadow:
-          0 20px 50px rgba(2, 8, 20, 0.4),
-          0 0 0 1px rgba(56, 189, 248, 0.06);
-        transform: translateY(-2px);
-      }
+
       .card-pad {
         padding: 24px;
       }
+
       .card-header {
         display: flex;
         justify-content: space-between;
@@ -280,11 +221,13 @@
         gap: 12px;
         margin-bottom: 20px;
       }
+
       .card-title {
         font-size: 0.92rem;
         font-weight: 700;
         color: var(--cyan-dim);
       }
+
       .card-badge {
         font-size: 0.72rem;
         font-weight: 700;
@@ -295,27 +238,89 @@
         color: var(--cyan-dim);
       }
 
-      /* ===== STAT CARDS ===== */
+      .api-key-box {
+        margin-bottom: 24px;
+      }
+
+      .api-key-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 24px;
+      }
+
+      .api-key-label {
+        font-size: 0.8rem;
+        color: var(--text-3);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .api-key-value {
+        font-size: 0.82rem;
+        color: var(--text-2);
+        word-break: break-all;
+        margin-top: 4px;
+        font-family: "Courier New", monospace;
+      }
+
+      .api-key-actions {
+        display: flex;
+        gap: 10px;
+        flex-shrink: 0;
+      }
+
+      .copy-btn,
+      .danger-btn {
+        padding: 8px 16px;
+        border-radius: var(--r-md);
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-weight: 700;
+        font-family: var(--font-body);
+        transition: 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .copy-btn {
+        border: 1px solid var(--border-2);
+        background: rgba(56, 189, 248, 0.08);
+        color: var(--cyan-dim);
+      }
+
+      .copy-btn:hover {
+        background: rgba(56, 189, 248, 0.16);
+        transform: translateY(-1px);
+      }
+
+      .danger-btn {
+        border: 1px solid rgba(248, 113, 113, 0.28);
+        background: rgba(248, 113, 113, 0.08);
+        color: #fca5a5;
+      }
+
+      .danger-btn:hover {
+        background: rgba(248, 113, 113, 0.16);
+        transform: translateY(-1px);
+      }
+
       .stats-row {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 18px;
         margin-bottom: 24px;
       }
+
       .stat-card {
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: var(--r-xl);
         padding: 22px 24px;
-        backdrop-filter: blur(18px);
         display: flex;
         align-items: flex-start;
         gap: 16px;
-        transition: 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-      .stat-card:hover {
-        transform: translateY(-3px);
-        border-color: var(--border-2);
       }
 
       .stat-icon {
@@ -328,113 +333,68 @@
         font-size: 20px;
         flex-shrink: 0;
       }
+
       .stat-icon.cyan {
         background: rgba(56, 189, 248, 0.12);
       }
+
       .stat-icon.green {
         background: rgba(52, 211, 153, 0.12);
       }
+
       .stat-icon.amber {
         background: rgba(251, 191, 36, 0.12);
       }
+
       .stat-icon.blue {
         background: rgba(59, 130, 246, 0.12);
       }
 
-      .stat-body {
-        flex: 1;
-        min-width: 0;
-      }
       .stat-value {
         font-family: var(--font-display);
         font-size: 2rem;
-        font-weight: 100;
+        font-weight: 800;
         color: var(--cyan);
         line-height: 1;
-        text-shadow: 0 0 24px rgba(56, 189, 248, 0.2);
       }
+
       .stat-value.green {
         color: var(--green);
-        text-shadow: 0 0 24px rgba(52, 211, 153, 0.2);
       }
+
       .stat-value.amber {
         color: var(--amber);
       }
+
       .stat-value.blue {
         color: var(--blue);
       }
+
       .stat-label {
         font-size: 0.8rem;
         color: var(--text-2);
         margin-top: 6px;
         font-weight: 500;
       }
+
       .stat-trend {
         font-size: 0.75rem;
         margin-top: 4px;
         font-weight: 600;
         color: var(--green);
-        display: flex;
-        align-items: center;
-        gap: 4px;
       }
 
-      /* ===== API KEY BOX ===== */
-      .api-key-box {
-        margin-bottom: 24px;
-      }
-      .api-key-inner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 18px 24px;
-      }
-      .api-key-label {
-        font-size: 0.8rem;
-        color: var(--text-3);
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
-      .api-key-value {
-        font-size: 0.82rem;
-        color: var(--text-2);
-        word-break: break-all;
-        margin-top: 4px;
-        font-family: "Courier New", monospace;
-      }
-      .copy-btn,
-      #copy-api-key-btn {
-        flex-shrink: 0;
-        padding: 8px 16px;
-        border: 1px solid var(--border-2);
-        border-radius: var(--r-md);
-        background: rgba(56, 189, 248, 0.08);
-        color: var(--cyan-dim);
-        cursor: pointer;
-        font-size: 0.78rem;
-        font-weight: 700;
-        font-family: var(--font-body);
-        transition: 0.2s ease;
-        white-space: nowrap;
-      }
-      .copy-btn:hover,
-      #copy-api-key-btn:hover {
-        background: rgba(56, 189, 248, 0.16);
-        transform: translateY(-1px);
-      }
-
-      /* ===== CHARTS GRID ===== */
       .charts-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
         margin-bottom: 24px;
       }
+
       .chart-full {
         grid-column: 1 / -1;
       }
+
       .chart-container {
         position: relative;
         width: 100%;
@@ -443,23 +403,22 @@
         border-radius: var(--r-lg);
         padding: 8px;
       }
+
       .chart-full .chart-container {
         height: 320px;
       }
 
-      /* ===== TABLE ===== */
-      .table-section {
-        margin-top: 0;
-      }
       .table-wrapper {
         overflow-x: auto;
         border-radius: var(--r-lg);
       }
+
       table {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.85rem;
       }
+
       thead th {
         padding: 13px 14px;
         color: var(--text-3);
@@ -471,22 +430,23 @@
         border-bottom: 1px solid var(--border);
         background: rgba(8, 13, 23, 0.5);
       }
+
       tbody td {
         padding: 13px 14px;
         border-bottom: 1px solid rgba(99, 179, 237, 0.07);
         color: var(--text-2);
       }
-      tbody tr {
-        transition: background 0.18s ease;
-      }
+
       tbody tr:hover {
         background: rgba(56, 189, 248, 0.05);
       }
+
       .empty-row {
         text-align: center;
         color: var(--text-3);
         padding: 28px !important;
       }
+
       .badge {
         display: inline-flex;
         align-items: center;
@@ -495,13 +455,13 @@
         font-size: 0.72rem;
         font-weight: 700;
       }
+
       .badge-green {
         background: rgba(52, 211, 153, 0.1);
         border: 1px solid rgba(52, 211, 153, 0.22);
         color: var(--green);
       }
 
-      /* ===== TOAST ===== */
       .toast {
         position: fixed;
         right: 24px;
@@ -515,40 +475,28 @@
         opacity: 0;
         transform: translateY(14px);
         pointer-events: none;
-        transition: 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: 0.28s ease;
         z-index: 9999;
         font-size: 0.88rem;
         font-weight: 600;
       }
+
       .toast.show {
         opacity: 1;
         transform: translateY(0);
       }
 
-      /* ===== PULSE ANIMATION ===== */
-      @keyframes pulse-glow {
-        0%,
-        100% {
-          box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.15);
-        }
-        50% {
-          box-shadow: 0 0 0 8px rgba(56, 189, 248, 0);
-        }
-      }
-      .stat-card:first-child {
-        animation: pulse-glow 3s ease-in-out infinite;
-      }
-
-      /* ===== RESPONSIVE ===== */
       @media (max-width: 1100px) {
         .stats-row {
           grid-template-columns: repeat(2, 1fr);
         }
       }
+
       @media (max-width: 980px) {
         .layout-wrapper {
           flex-direction: column;
         }
+
         .sidebar {
           width: 100%;
           height: auto;
@@ -557,131 +505,157 @@
           flex-wrap: wrap;
           padding: 16px;
         }
+
         .sidebar-logo {
           border-bottom: none;
           padding-bottom: 0;
           margin-bottom: 0;
         }
+
         .sidebar-section-label {
           display: none;
         }
+
         .nav-link.nav-logout {
           margin-top: 0;
         }
+
         .main-content {
           padding: 24px 20px;
         }
+
         .charts-grid {
           grid-template-columns: 1fr;
         }
+
         .page-header {
           flex-direction: column;
           gap: 12px;
         }
+
+        .api-key-inner {
+          flex-direction: column;
+          align-items: flex-start;
+        }
       }
+
       @media (max-width: 640px) {
         .stats-row {
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: 1fr;
         }
-        .stat-value {
-          font-size: 1.6rem;
-        }
+
         .main-content {
           padding: 18px 14px;
         }
-      }
-      @media (max-width: 420px) {
-        .stats-row {
-          grid-template-columns: 1fr;
+
+        .api-key-actions {
+          width: 100%;
+        }
+
+        .copy-btn,
+        .danger-btn {
+          width: 100%;
         }
       }
     </style>
   </head>
+
   <body>
     <div class="layout-wrapper">
-      <!-- SIDEBAR -->
       <aside class="sidebar">
         <a href="dashboard.html" class="sidebar-logo">
           <div class="sidebar-logo-icon">◈</div>
           Data Alumni
         </a>
+
         <div class="sidebar-section-label">Navigasi</div>
+
         <a href="dashboard.html" class="nav-link active">
           <div class="nav-icon">📊</div>
           Dashboard
         </a>
+
         <a href="data.html" class="nav-link">
           <div class="nav-icon">🗄️</div>
           Data Alumni
         </a>
+
         <a href="input.html" class="nav-link">
           <div class="nav-icon">✏️</div>
-          Input Data
+          Edit Data
         </a>
+
         <a href="#" class="nav-link nav-logout" onclick="logout()">
           <div class="nav-icon">🚪</div>
           Logout
         </a>
       </aside>
 
-      <!-- MAIN -->
       <main class="main-content">
-        <!-- Header -->
         <div class="page-header">
-          <div class="page-header-left">
+          <div>
             <h1 class="page-title">Dashboard Overview</h1>
             <p class="page-subtitle">
               Visualisasi serapan kerja alumni TKJ &amp; TMJ
             </p>
           </div>
+
           <div class="header-date" id="live-date">📅 <span>—</span></div>
         </div>
 
-        <!-- API Key -->
         <div class="card api-key-box">
           <div class="api-key-inner">
             <div>
               <div class="api-key-label">🔑 API Key Aktif</div>
-              <div id="api-key-display" class="api-key-value">Memuat...</div>
+              <div id="api-key-value" class="api-key-value">Memuat...</div>
             </div>
-            <button type="button" id="copy-api-key-btn">Copy</button>
+
+            <div class="api-key-actions">
+              <button type="button" id="btn-copy-key" class="copy-btn">
+                Copy
+              </button>
+              <button type="button" id="btn-regenerate-key" class="danger-btn">
+                Ganti Key
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Stats Row -->
         <div class="stats-row">
           <div class="stat-card">
             <div class="stat-icon cyan">📈</div>
-            <div class="stat-body">
+            <div>
               <div class="stat-value" id="global-waktu-tunggu">—</div>
               <div class="stat-label">Waktu Tunggu Rata-Rata</div>
               <div class="stat-trend">↑ Bulan</div>
             </div>
           </div>
+
           <div class="stat-card">
             <div class="stat-icon green">👥</div>
-            <div class="stat-body">
+            <div>
               <div class="stat-value green" id="total-alumni">—</div>
               <div class="stat-label">Total Alumni Terdata</div>
             </div>
           </div>
+
           <div class="stat-card">
             <div class="stat-icon amber">💼</div>
-            <div class="stat-body">
+            <div>
               <div class="stat-value amber" id="jumlah-bekerja">—</div>
               <div class="stat-label">Alumni Bekerja</div>
             </div>
           </div>
+
           <div class="stat-card">
             <div class="stat-icon blue">🎯</div>
-            <div class="stat-body">
+            <div>
               <div class="stat-value blue" id="persentase-serapan">—</div>
               <div class="stat-label">Persentase Serapan</div>
             </div>
           </div>
         </div>
 
-        <!-- Charts -->
         <div class="charts-grid">
           <div class="card card-pad">
             <div class="card-header">
@@ -692,6 +666,7 @@
               <canvas id="chart-waktu-tunggu-prodi"></canvas>
             </div>
           </div>
+
           <div class="card card-pad">
             <div class="card-header">
               <h3 class="card-title">Distribusi Alumni per Prodi</h3>
@@ -701,15 +676,17 @@
               <canvas id="chart-alumni-prodi"></canvas>
             </div>
           </div>
+
           <div class="card card-pad chart-full">
             <div class="card-header">
               <h3 class="card-title">Status Kerja per Program Studi</h3>
               <span class="card-badge">Perbandingan</span>
             </div>
-            <div class="chart-container" style="height: 320px">
+            <div class="chart-container">
               <canvas id="chart-status-kerja"></canvas>
             </div>
           </div>
+
           <div class="card card-pad chart-full">
             <div class="card-header">
               <h3 class="card-title">
@@ -717,14 +694,13 @@
               </h3>
               <span class="card-badge">Tren</span>
             </div>
-            <div class="chart-container" style="height: 320px">
+            <div class="chart-container">
               <canvas id="chart-serapan-tahun"></canvas>
             </div>
           </div>
         </div>
 
-        <!-- Recent Alumni Table -->
-        <div class="card card-pad table-section">
+        <div class="card card-pad">
           <div class="card-header">
             <h3 class="card-title">Data Alumni Terbaru</h3>
             <a
@@ -735,9 +711,11 @@
                 text-decoration: none;
                 font-weight: 700;
               "
-              >Lihat Semua →</a
             >
+              Lihat Semua →
+            </a>
           </div>
+
           <div class="table-wrapper">
             <table>
               <thead>
@@ -749,6 +727,7 @@
                   <th>Pendapatan</th>
                 </tr>
               </thead>
+
               <tbody id="alumni-table-body">
                 <tr>
                   <td colspan="5" class="empty-row">Memuat data...</td>
@@ -762,15 +741,14 @@
 
     <div id="toast" class="toast"></div>
 
-    <script src="js/app.js?v=700"></script>
+    <script src="js/app.js?v=902"></script>
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        checkAuth();
-
-        // Live date
         const dateEl = document.getElementById("live-date");
+
         if (dateEl) {
           const now = new Date();
+
           dateEl.innerHTML =
             "📅 <span>" +
             now.toLocaleDateString("id-ID", {
@@ -781,18 +759,6 @@
             }) +
             "</span>";
         }
-
-        // API Key display
-        const apiKey = localStorage.getItem("api_key");
-        const apiKeyDisplay = document.getElementById("api-key-display");
-        const copyBtn = document.getElementById("copy-api-key-btn");
-        if (apiKeyDisplay)
-          apiKeyDisplay.textContent = apiKey || "API key tidak ditemukan.";
-        if (copyBtn) copyBtn.addEventListener("click", () => copyApiKey());
-
-        if (typeof loadAlumniData === "function") loadAlumniData();
-        if (typeof loadDashboardCharts === "function") loadDashboardCharts();
-        if (typeof loadSerapanSummary === "function") loadSerapanSummary();
       });
     </script>
   </body>

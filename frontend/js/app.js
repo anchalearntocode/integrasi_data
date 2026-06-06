@@ -29,13 +29,12 @@ const CHART_COLORS_SOLID = [
   "#f97316",
 ];
 
-// ===== PAGINATION STATE =====
 let currentPage = 1;
 let currentLimit = 100;
 let currentPagination = null;
 let currentRows = [];
 
-// ===== HELPER API KEY =====
+// ===== HELPER =====
 function getApiKey() {
   return localStorage.getItem("api_key");
 }
@@ -46,7 +45,13 @@ function getAuthHeaders() {
   };
 }
 
-// ===== TOAST =====
+function getJsonHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "X-API-KEY": getApiKey(),
+  };
+}
+
 function showToast(message) {
   let toast = document.getElementById("toast");
 
@@ -65,22 +70,67 @@ function showToast(message) {
   }, 2200);
 }
 
-// ===== COPY API KEY =====
-function copyApiKey() {
-  const apiKey = getApiKey();
+function showAlert(elementId, type, message) {
+  const alertEl = document.getElementById(elementId);
+  if (!alertEl) return;
 
-  if (!apiKey) {
-    alert("API Key tidak ditemukan.");
-    return;
-  }
+  alertEl.style.display = "block";
+  alertEl.className = `alert alert-${type}`;
+  alertEl.innerHTML = message;
 
-  navigator.clipboard
-    .writeText(apiKey)
-    .then(() => showToast("✅ API Key berhasil disalin."))
-    .catch(() => showToast("❌ Gagal menyalin API Key."));
+  setTimeout(() => {
+    alertEl.style.display = "none";
+  }, 5000);
 }
 
-// ===== UNAUTHORIZED HANDLER =====
+function setButtonLoading(button, loadingText, loading) {
+  if (!button) return;
+
+  if (loading) {
+    button.dataset.originalText = button.innerHTML;
+    button.innerHTML = loadingText;
+    button.disabled = true;
+  } else {
+    button.innerHTML = button.dataset.originalText || button.innerHTML;
+    button.disabled = false;
+  }
+}
+
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const finalValue = value ?? "";
+
+  if (el.tagName === "SELECT") {
+    const exists = Array.from(el.options).some(
+      (option) => option.value === String(finalValue),
+    );
+
+    if (!exists && finalValue !== "") {
+      const option = document.createElement("option");
+      option.value = finalValue;
+      option.textContent = finalValue;
+      el.appendChild(option);
+    }
+  }
+
+  el.value = finalValue;
+}
+
+function updateApiKeyView() {
+  const apiKey = getApiKey();
+
+  const apiKeyInput = document.getElementById("api-key");
+  const apiKeyText = document.getElementById("api-key-text");
+  const apiKeyValue = document.getElementById("api-key-value");
+
+  if (apiKeyInput) apiKeyInput.value = apiKey || "";
+  if (apiKeyText) apiKeyText.textContent = apiKey || "-";
+  if (apiKeyValue) apiKeyValue.textContent = apiKey || "-";
+}
+
+// ===== AUTH =====
 function handleUnauthorized(result) {
   if (
     result &&
@@ -98,7 +148,6 @@ function handleUnauthorized(result) {
   return false;
 }
 
-// ===== AUTH CHECK =====
 function checkAuth() {
   const userId = localStorage.getItem("user_id");
   const apiKey = localStorage.getItem("api_key");
@@ -113,7 +162,6 @@ function checkAuth() {
   }
 }
 
-// ===== LOGOUT =====
 async function logout() {
   const apiKey = localStorage.getItem("api_key");
 
@@ -121,9 +169,7 @@ async function logout() {
     if (apiKey) {
       await fetch(`${API_URL}?resource=auth&action=logout`, {
         method: "POST",
-        headers: {
-          "X-API-KEY": apiKey,
-        },
+        headers: { "X-API-KEY": apiKey },
       });
     }
   } catch (error) {
@@ -133,6 +179,96 @@ async function logout() {
     localStorage.removeItem("username");
     localStorage.removeItem("api_key");
     window.location.href = "index.html";
+  }
+}
+
+function copyApiKey() {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    showToast("❌ API Key tidak ditemukan.");
+    return;
+  }
+
+  navigator.clipboard
+    .writeText(apiKey)
+    .then(() => showToast("✅ API Key berhasil disalin."))
+    .catch(() => showToast("❌ Gagal menyalin API Key."));
+}
+
+async function regenerateApiKey() {
+  const apiKey = getApiKey();
+  const button =
+    document.getElementById("btn-regenerate-key") ||
+    document.getElementById("regenerate-api-key") ||
+    document.querySelector("[data-action='regenerate-api-key']");
+
+  if (!apiKey) {
+    showToast("❌ API Key tidak ditemukan. Login ulang.");
+    return;
+  }
+
+  const confirmation = confirm(
+    "Yakin ingin mengganti API Key? API Key lama akan langsung tidak berlaku.",
+  );
+
+  if (!confirmation) return;
+
+  try {
+    setButtonLoading(
+      button,
+      "<span>⏳</span><span>Mengganti Key...</span>",
+      true,
+    );
+
+    const response = await fetch(
+      `${API_URL}?resource=auth&action=regenerate_key`,
+      {
+        method: "POST",
+        headers: {
+          "X-API-KEY": apiKey,
+        },
+      },
+    );
+
+    const result = await response.json();
+
+    console.log("RESPONSE REGENERATE API KEY:", result);
+
+    if (handleUnauthorized(result)) return;
+
+    if (result.status === "success") {
+      const newApiKey = result.data?.api_key;
+
+      if (!newApiKey) {
+        showToast("❌ Key baru tidak ditemukan dari response server.");
+        return;
+      }
+
+      localStorage.setItem("api_key", newApiKey);
+      updateApiKeyView();
+
+      showToast("✅ API Key berhasil diganti. Key lama sudah hangus.");
+
+      const alertBox =
+        document.getElementById("api-key-alert") ||
+        document.getElementById("profile-alert") ||
+        document.getElementById("settings-alert");
+
+      if (alertBox) {
+        alertBox.style.display = "block";
+        alertBox.className = "alert alert-success";
+        alertBox.innerHTML =
+          "API Key berhasil diganti. API Key lama sudah tidak berlaku.";
+      }
+    } else {
+      showToast(result.message || "❌ Gagal mengganti API Key.");
+    }
+  } catch (error) {
+    console.error("Regenerate API Key error:", error);
+    showToast("❌ Gagal terhubung ke server saat mengganti API Key.");
+  } finally {
+    setButtonLoading(button, "", false);
   }
 }
 
@@ -154,9 +290,7 @@ if (document.getElementById("form-login")) {
       try {
         const response = await fetch(`${API_URL}?resource=auth&action=login`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
         });
 
@@ -208,9 +342,7 @@ if (document.getElementById("form-register")) {
           `${API_URL}?resource=auth&action=register`,
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password }),
           },
         );
@@ -223,8 +355,13 @@ if (document.getElementById("form-register")) {
           alertEl.textContent = "Registrasi berhasil! Silakan login.";
 
           setTimeout(() => {
-            toggleAuth("login");
-            document.getElementById("login-username").value = username;
+            if (typeof toggleAuth === "function") {
+              toggleAuth("login");
+            }
+
+            const loginUsername = document.getElementById("login-username");
+            if (loginUsername) loginUsername.value = username;
+
             alertEl.style.display = "none";
           }, 1500);
         } else {
@@ -243,7 +380,7 @@ if (document.getElementById("form-register")) {
     });
 }
 
-// ===== BADGE HELPER =====
+// ===== BADGE =====
 function statusBadge(status) {
   const map = {
     Bekerja: "badge-green",
@@ -253,11 +390,10 @@ function statusBadge(status) {
   };
 
   const cls = map[status] || "badge-blue";
-
   return `<span class="badge ${cls}">${status ?? "-"}</span>`;
 }
 
-// ===== DASHBOARD ALUMNI PREVIEW =====
+// ===== DASHBOARD PREVIEW =====
 async function loadAlumniData() {
   const tableBody = document.getElementById("alumni-table-body");
   if (!tableBody) return;
@@ -316,14 +452,9 @@ async function loadDashboardCharts() {
     const result = await response.json();
 
     if (handleUnauthorized(result)) return;
-
-    if (result.status !== "success") {
-      console.error(result.message);
-      return;
-    }
+    if (result.status !== "success") return;
 
     const data = result.data || {};
-
     const globalStat = document.getElementById("global-waktu-tunggu");
 
     if (globalStat && data.waktu_tunggu_global) {
@@ -354,29 +485,7 @@ async function loadDashboardCharts() {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
-          scales: {
-            x: {
-              grid: {
-                color: "rgba(99,179,237,0.07)",
-              },
-              ticks: {
-                color: "#94a9c4",
-              },
-            },
-            y: {
-              grid: {
-                color: "rgba(99,179,237,0.07)",
-              },
-              ticks: {
-                color: "#94a9c4",
-              },
-            },
-          },
+          plugins: { legend: { display: false } },
         },
       });
     }
@@ -401,15 +510,6 @@ async function loadDashboardCharts() {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: {
-                color: "#94a9c4",
-                padding: 16,
-              },
-            },
-          },
           cutout: "62%",
         },
       });
@@ -441,41 +541,13 @@ async function loadDashboardCharts() {
 
       new Chart(ctxStatus, {
         type: "bar",
-        data: {
-          labels: prodis,
-          datasets,
-        },
+        data: { labels: prodis, datasets },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            x: {
-              stacked: true,
-              grid: {
-                display: false,
-              },
-              ticks: {
-                color: "#94a9c4",
-              },
-            },
-            y: {
-              stacked: true,
-              grid: {
-                color: "rgba(99,179,237,0.07)",
-              },
-              ticks: {
-                color: "#94a9c4",
-              },
-            },
-          },
-          plugins: {
-            legend: {
-              position: "top",
-              labels: {
-                color: "#94a9c4",
-                padding: 16,
-              },
-            },
+            x: { stacked: true },
+            y: { stacked: true },
           },
         },
       });
@@ -515,43 +587,13 @@ async function loadDashboardCharts() {
 
       new Chart(ctxSerapan, {
         type: "line",
-        data: {
-          labels: years,
-          datasets,
-        },
+        data: { labels: years, datasets },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           interaction: {
             mode: "index",
             intersect: false,
-          },
-          scales: {
-            x: {
-              grid: {
-                color: "rgba(99,179,237,0.07)",
-              },
-              ticks: {
-                color: "#94a9c4",
-              },
-            },
-            y: {
-              grid: {
-                color: "rgba(99,179,237,0.07)",
-              },
-              ticks: {
-                color: "#94a9c4",
-              },
-            },
-          },
-          plugins: {
-            legend: {
-              position: "top",
-              labels: {
-                color: "#94a9c4",
-                padding: 16,
-              },
-            },
           },
         },
       });
@@ -581,11 +623,7 @@ async function loadSerapanSummary() {
     const result = await response.json();
 
     if (handleUnauthorized(result)) return;
-
-    if (result.status !== "success") {
-      console.error(result.message);
-      return;
-    }
+    if (result.status !== "success") return;
 
     const data = result.data || {};
 
@@ -601,23 +639,13 @@ async function loadSerapanSummary() {
     const pctEl = document.getElementById("persentase-serapan");
 
     if (pctEl) {
-      let current = 0;
-      const target = parseFloat(data.persentase_serapan ?? 0);
-      const step = target / 40;
-
-      const interval = setInterval(() => {
-        current = Math.min(current + step, target);
-        pctEl.textContent = current.toFixed(1) + "%";
-
-        if (current >= target) clearInterval(interval);
-      }, 30);
+      pctEl.textContent = `${parseFloat(data.persentase_serapan ?? 0).toFixed(1)}%`;
     }
   } catch (error) {
     console.error("Fetch serapan summary error:", error);
   }
 }
 
-// ===== ANIMATED COUNT =====
 function animateCount(el, target) {
   let current = 0;
   const step = Math.max(1, Math.floor(target / 40));
@@ -630,7 +658,7 @@ function animateCount(el, target) {
   }, 30);
 }
 
-// ===== LOAD FILTER DIMENSI =====
+// ===== FILTER DATA =====
 async function loadDataFilters() {
   const prodiFilter = document.getElementById("filter-prodi");
   const statusFilter = document.getElementById("filter-status");
@@ -702,7 +730,7 @@ async function loadDataFilters() {
   }
 }
 
-// ===== FULL DATA TABLE WITH API PAGINATION =====
+// ===== FULL TABLE =====
 async function loadFullAlumniData(page = 1) {
   const tableBody = document.getElementById("full-alumni-table-body");
   if (!tableBody) return;
@@ -717,15 +745,10 @@ async function loadFullAlumniData(page = 1) {
   params.set("page", currentPage);
   params.set("limit", currentLimit);
 
-  if (prodiVal !== "all") {
-    params.set("prodi", prodiVal);
-  }
+  if (prodiVal !== "all") params.set("prodi", prodiVal);
+  if (statusVal !== "all") params.set("status", statusVal);
 
-  if (statusVal !== "all") {
-    params.set("status", statusVal);
-  }
-
-  tableBody.innerHTML = `<tr><td colspan="7" class="empty-row">⏳ Memuat data...</td></tr>`;
+  tableBody.innerHTML = `<tr><td colspan="8" class="empty-row">⏳ Memuat data...</td></tr>`;
 
   try {
     const response = await fetch(`${API_URL}?${params.toString()}`, {
@@ -738,7 +761,7 @@ async function loadFullAlumniData(page = 1) {
     if (handleUnauthorized(result)) return;
 
     if (result.status !== "success") {
-      tableBody.innerHTML = `<tr><td colspan="7" class="empty-row">${result.message || "Gagal memuat data."}</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="8" class="empty-row">${result.message || "Gagal memuat data."}</td></tr>`;
       return;
     }
 
@@ -749,7 +772,7 @@ async function loadFullAlumniData(page = 1) {
     renderPagination();
   } catch (error) {
     console.error("Fetch full alumni error:", error);
-    tableBody.innerHTML = `<tr><td colspan="7" class="empty-row">Error koneksi ke server.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="8" class="empty-row">Error koneksi ke server.</td></tr>`;
   }
 }
 
@@ -759,7 +782,6 @@ function renderFullTable() {
 
   const rows = currentRows || [];
   const pagination = currentPagination;
-
   const countEl = document.getElementById("row-count-display");
 
   if (countEl && pagination) {
@@ -771,7 +793,7 @@ function renderFullTable() {
   }
 
   if (rows.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="7" class="empty-row">🔍 Tidak ada data yang cocok.</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="8" class="empty-row">🔍 Tidak ada data yang cocok.</td></tr>`;
     return;
   }
 
@@ -779,10 +801,10 @@ function renderFullTable() {
 
   rows.forEach((row, idx) => {
     const tr = document.createElement("tr");
-
     tr.style.animationDelay = `${idx * 20}ms`;
 
     tr.innerHTML = `
+      <td><code style="color:var(--cyan-dim);font-size:.78rem">${row.id_fact ?? "-"}</code></td>
       <td><code style="color:var(--cyan-dim);font-size:.78rem">${row.kode_responden_asli ?? "-"}</code></td>
       <td>${row.nama_prodi ?? "-"}</td>
       <td>${row.tahun_lulus ?? "-"}</td>
@@ -807,29 +829,11 @@ function renderPagination() {
 
   wrapper.innerHTML = `
     <div class="pagination-box" style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap;">
-      <button 
-        type="button"
-        class="pagination-btn"
-        ${!hasPrevious ? "disabled" : ""}
-        onclick="goToAlumniPage(${page - 1})"
-        style="padding:9px 14px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);cursor:pointer;"
-      >
-        Previous
-      </button>
-
+      <button type="button" class="pagination-btn" ${!hasPrevious ? "disabled" : ""} onclick="goToAlumniPage(${page - 1})">Previous</button>
       <span style="color:var(--text-secondary);font-size:14px;">
         Page <b style="color:var(--primary-color);">${page}</b> of <b style="color:var(--primary-color);">${totalPages}</b>
       </span>
-
-      <button 
-        type="button"
-        class="pagination-btn"
-        ${!hasNext ? "disabled" : ""}
-        onclick="goToAlumniPage(${page + 1})"
-        style="padding:9px 14px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--text-secondary);cursor:pointer;"
-      >
-        Next
-      </button>
+      <button type="button" class="pagination-btn" ${!hasNext ? "disabled" : ""} onclick="goToAlumniPage(${page + 1})">Next</button>
     </div>
   `;
 }
@@ -844,10 +848,330 @@ function goToAlumniPage(page) {
   loadFullAlumniData(page);
 }
 
-// ===== INIT DATA PAGE =====
+// ===== IMPORT EXCEL ETL =====
+function setImportLoading(button, loading) {
+  if (!button) return;
+
+  if (loading) {
+    button.disabled = true;
+    button.innerHTML = "⏳ Mengimpor...";
+  } else {
+    button.disabled = false;
+    button.innerHTML = "Import Excel ETL";
+  }
+}
+
+async function importExcelETL() {
+  const formImport = document.getElementById("form-import-excel");
+  const fileInput = document.getElementById("excel-file");
+  const alertBox = document.getElementById("import-alert");
+  const button = formImport?.querySelector('button[type="submit"]');
+
+  if (!fileInput || fileInput.files.length === 0) {
+    if (alertBox) {
+      alertBox.style.display = "block";
+      alertBox.className = "alert alert-error";
+      alertBox.innerHTML = "Pilih file Excel terlebih dahulu.";
+    }
+
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  setImportLoading(button, true);
+
+  if (alertBox) {
+    alertBox.style.display = "block";
+    alertBox.className = "alert alert-info";
+    alertBox.innerHTML = "⏳ Proses ETL sedang berjalan...";
+  }
+
+  try {
+    const response = await fetch(
+      `${API_URL}?resource=alumni&action=import_excel`,
+      {
+        method: "POST",
+        headers: {
+          "X-API-KEY": getApiKey(),
+        },
+        body: formData,
+      },
+    );
+
+    const result = await response.json();
+
+    if (handleUnauthorized(result)) return;
+
+    if (result.status === "success") {
+      const data = result.data || {};
+
+      if (alertBox) {
+        alertBox.className = "alert alert-success";
+        alertBox.innerHTML = `
+          <b>✅ Import Excel ETL Berhasil</b><br>
+          File: ${data.file_name ?? "-"}<br>
+          Total Row: ${data.total_rows ?? 0}<br>
+          Inserted: ${data.inserted ?? 0}<br>
+          Skipped: ${data.skipped ?? 0}<br>
+          Failed: ${data.failed ?? 0}
+        `;
+      }
+
+      fileInput.value = "";
+      showToast("✅ ETL Excel berhasil diproses.");
+      loadFullAlumniData(1);
+      loadDashboardCharts();
+      loadSerapanSummary();
+    } else {
+      if (alertBox) {
+        const data = result.data || {};
+        const missingColumns = data.missing_columns
+          ? `<br>Kolom hilang: ${data.missing_columns.join(", ")}`
+          : "";
+
+        alertBox.className = "alert alert-error";
+        alertBox.innerHTML = `
+          <b>❌ Import Gagal</b><br>
+          ${result.message || "Terjadi kesalahan saat import."}
+          ${missingColumns}
+        `;
+      }
+
+      showToast("❌ Import Excel gagal.");
+    }
+  } catch (error) {
+    console.error("Import Excel ETL error:", error);
+
+    if (alertBox) {
+      alertBox.style.display = "block";
+      alertBox.className = "alert alert-error";
+      alertBox.innerHTML = "Gagal menghubungi server saat import Excel.";
+    }
+  } finally {
+    setImportLoading(button, false);
+  }
+}
+
+// ===== EDIT DATA ALUMNI =====
+function fillAlumniEditForm(data) {
+  setValue("id_fact", data.id_fact);
+  setValue("kode_responden_asli", data.kode_responden_asli);
+  setValue("tahun_lulus", data.tahun_lulus);
+  setValue("nama_prodi", data.nama_prodi);
+  setValue("jenjang", data.jenjang);
+  setValue("jurusan", data.jurusan || "Teknik Informatika dan Komputer");
+  setValue("status_kerja", data.status_kerja);
+  setValue("jenis_pekerjaan", data.jenis_pekerjaan);
+  setValue("kategori_instansi", data.kategori_instansi);
+  setValue("jenis_lembaga", data.jenis_lembaga);
+  setValue("range_pendapatan", data.range_pendapatan);
+  setValue("lama_tunggu_bulan", data.lama_tunggu_bulan);
+  setValue("nama_kota", data.nama_kota);
+}
+
+function getAlumniEditFormData() {
+  return {
+    id_fact: document.getElementById("id_fact")?.value,
+    kode_responden_asli: document.getElementById("kode_responden_asli")?.value,
+    tahun_lulus: document.getElementById("tahun_lulus")?.value,
+    nama_prodi: document.getElementById("nama_prodi")?.value,
+    jenjang: document.getElementById("jenjang")?.value,
+    jurusan:
+      document.getElementById("jurusan")?.value ||
+      "Teknik Informatika dan Komputer",
+    status_kerja: document.getElementById("status_kerja")?.value,
+    jenis_pekerjaan:
+      document.getElementById("jenis_pekerjaan")?.value || "Tidak Diketahui",
+    kategori_instansi: document.getElementById("kategori_instansi")?.value,
+    jenis_lembaga:
+      document.getElementById("jenis_lembaga")?.value || "Tidak Diketahui",
+    range_pendapatan: document.getElementById("range_pendapatan")?.value,
+    lama_tunggu_bulan: document.getElementById("lama_tunggu_bulan")?.value,
+    nama_kota: document.getElementById("nama_kota")?.value,
+  };
+}
+
+async function loadAlumniForEdit() {
+  const idFact = document.getElementById("id_fact")?.value;
+  const btn = document.getElementById("btn-load-data");
+
+  if (!getApiKey()) {
+    showAlert("form-alert", "error", "API Key tidak ditemukan. Login ulang.");
+    return;
+  }
+
+  if (!idFact) {
+    showAlert("form-alert", "error", "Masukkan ID Fact terlebih dahulu.");
+    return;
+  }
+
+  try {
+    setButtonLoading(btn, "<span>⏳</span><span>Mencari...</span>", true);
+
+    const response = await fetch(
+      `${API_URL}?resource=alumni&id_fact=${encodeURIComponent(idFact)}`,
+      {
+        method: "GET",
+        headers: getAuthHeaders(),
+      },
+    );
+
+    const result = await response.json();
+
+    if (handleUnauthorized(result)) return;
+
+    if (result.status !== "success") {
+      showAlert(
+        "form-alert",
+        "error",
+        result.message || "Data tidak ditemukan.",
+      );
+      return;
+    }
+
+    fillAlumniEditForm(result.data);
+    showAlert("form-alert", "success", "Data berhasil dimuat ke form edit.");
+  } catch (error) {
+    console.error("Load alumni edit error:", error);
+    showAlert("form-alert", "error", "Gagal terhubung ke server.");
+  } finally {
+    setButtonLoading(btn, "", false);
+  }
+}
+
+async function updateAlumniData(e) {
+  e.preventDefault();
+
+  const btn = document.querySelector('#form-alumni button[type="submit"]');
+  const data = getAlumniEditFormData();
+
+  if (!getApiKey()) {
+    showAlert("form-alert", "error", "API Key tidak ditemukan. Login ulang.");
+    return;
+  }
+
+  if (!data.id_fact) {
+    showAlert("form-alert", "error", "ID Fact wajib diisi untuk update data.");
+    return;
+  }
+
+  try {
+    setButtonLoading(btn, "<span>⏳</span><span>Mengupdate...</span>", true);
+
+    const response = await fetch(`${API_URL}?resource=alumni`, {
+      method: "PUT",
+      headers: getJsonHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (handleUnauthorized(result)) return;
+
+    if (result.status === "success") {
+      showAlert("form-alert", "success", result.message);
+      showToast("✅ Data alumni berhasil diperbarui.");
+    } else {
+      showAlert("form-alert", "error", result.message || "Update gagal.");
+    }
+  } catch (error) {
+    console.error("Update alumni error:", error);
+    showAlert("form-alert", "error", "Gagal terhubung ke server.");
+  } finally {
+    setButtonLoading(btn, "", false);
+  }
+}
+
+function resetAlumniEditForm() {
+  const form = document.getElementById("form-alumni");
+  if (form) form.reset();
+
+  setValue("id_fact", "");
+  showAlert("form-alert", "info", "Form berhasil dikosongkan.");
+}
+
+function initEditAlumniPage() {
+  const btnLoad = document.getElementById("btn-load-data");
+  const formAlumni = document.getElementById("form-alumni");
+  const btnReset = document.getElementById("btn-reset-form");
+
+  if (btnLoad) {
+    btnLoad.addEventListener("click", loadAlumniForEdit);
+  }
+
+  if (formAlumni) {
+    formAlumni.addEventListener("submit", updateAlumniData);
+  }
+
+  if (btnReset) {
+    btnReset.addEventListener("click", resetAlumniEditForm);
+  }
+
+  const urlId = new URLSearchParams(window.location.search).get("id");
+
+  if (urlId && document.getElementById("id_fact")) {
+    setValue("id_fact", urlId);
+    loadAlumniForEdit();
+  }
+}
+
+function initApiKeyActions() {
+  updateApiKeyView();
+
+  const btnCopy =
+    document.getElementById("btn-copy-key") ||
+    document.getElementById("copy-api-key") ||
+    document.querySelector("[data-action='copy-api-key']");
+
+  const btnRegenerate =
+    document.getElementById("btn-regenerate-key") ||
+    document.getElementById("regenerate-api-key") ||
+    document.querySelector("[data-action='regenerate-api-key']");
+
+  if (btnCopy) {
+    btnCopy.addEventListener("click", copyApiKey);
+  }
+
+  if (btnRegenerate) {
+    btnRegenerate.addEventListener("click", regenerateApiKey);
+  }
+}
+
+// ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
+  checkAuth();
+
+  if (document.getElementById("alumni-table-body")) {
+    loadAlumniData();
+  }
+
+  if (
+    document.getElementById("global-waktu-tunggu") ||
+    document.getElementById("chart-waktu-tunggu-prodi")
+  ) {
+    loadDashboardCharts();
+  }
+
+  if (document.getElementById("total-alumni")) {
+    loadSerapanSummary();
+  }
+
   if (document.getElementById("full-alumni-table-body")) {
     loadDataFilters();
     loadFullAlumniData(1);
   }
+
+  const formImport = document.getElementById("form-import-excel");
+
+  if (formImport) {
+    formImport.addEventListener("submit", function (e) {
+      e.preventDefault();
+      importExcelETL();
+    });
+  }
+
+  initEditAlumniPage();
+  initApiKeyActions();
 });
