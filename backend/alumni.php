@@ -1,4 +1,8 @@
 <?php
+ini_set("display_errors", 1);
+ini_set("display_startup_errors", 1);
+error_reporting(E_ALL);
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
@@ -10,8 +14,14 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 }
 
 require_once __DIR__ . "/db.php";
-require_once __DIR__ . "/vendor/autoload.php";
-require_once __DIR__ . "/etl/excel_import.php";
+
+if (file_exists(__DIR__ . "/vendor/autoload.php")) {
+    require_once __DIR__ . "/vendor/autoload.php";
+}
+
+if (file_exists(__DIR__ . "/etl/excel_import.php")) {
+    require_once __DIR__ . "/etl/excel_import.php";
+}
 
 function json_response($status, $data = null, $message = "", $total = null, $code = 200, $pagination = null) {
     http_response_code($code);
@@ -46,12 +56,26 @@ function get_json_body() {
 }
 
 function get_api_key() {
-    $headers = getallheaders();
+    if (function_exists("getallheaders")) {
+        $headers = getallheaders();
 
-    foreach ($headers as $key => $value) {
-        if (strtolower($key) === "x-api-key") {
-            return trim($value);
+        foreach ($headers as $key => $value) {
+            if (strtolower($key) === "x-api-key") {
+                return trim($value);
+            }
         }
+    }
+
+    if (!empty($_SERVER["HTTP_X_API_KEY"])) {
+        return trim($_SERVER["HTTP_X_API_KEY"]);
+    }
+
+    if (!empty($_SERVER["REDIRECT_HTTP_X_API_KEY"])) {
+        return trim($_SERVER["REDIRECT_HTTP_X_API_KEY"]);
+    }
+
+    if (!empty($_GET["api_key"])) {
+        return trim($_GET["api_key"]);
     }
 
     return null;

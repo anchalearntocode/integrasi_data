@@ -1,0 +1,2057 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MiniPostman — API Tester</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --panel: #111827;
+        --panel-2: #0f172a;
+        --border: rgba(148, 163, 184, 0.18);
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --muted-2: #64748b;
+        --primary: #a3e635;
+        --primary-2: #22c55e;
+        --blue: #38bdf8;
+        --amber: #fbbf24;
+        --red: #fb7185;
+        --purple: #a78bfa;
+        --radius: 18px;
+        --mono: "JetBrains Mono", monospace;
+        --sans: "Inter", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: var(--sans);
+        background:
+          radial-gradient(
+            circle at 20% 0%,
+            rgba(163, 230, 53, 0.14),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at 85% 20%,
+            rgba(56, 189, 248, 0.1),
+            transparent 30%
+          ),
+          var(--bg);
+        color: var(--text);
+      }
+
+      .app {
+        width: min(1650px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 22px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .brand-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 15px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--primary), var(--primary-2));
+        color: #052e16;
+        font-weight: 900;
+        font-family: var(--mono);
+      }
+
+      .brand h1 {
+        font-size: 1.45rem;
+        font-weight: 800;
+      }
+
+      .brand p {
+        color: var(--muted);
+        font-size: 0.86rem;
+        margin-top: 3px;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .endpoint-badge {
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.74);
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 0.76rem;
+        word-break: break-all;
+        max-width: 680px;
+      }
+
+      .main-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .card,
+      .docs-card {
+        border: 1px solid var(--border);
+        background: rgba(17, 24, 39, 0.84);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+      }
+
+      .request-bar {
+        display: grid;
+        grid-template-columns: 130px 1fr 130px;
+        gap: 12px;
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.64);
+      }
+
+      select,
+      input,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: #020617;
+        color: var(--text);
+        border-radius: 12px;
+        padding: 12px 13px;
+        outline: none;
+        font-family: var(--sans);
+      }
+
+      input,
+      textarea {
+        font-family: var(--mono);
+        font-size: 0.84rem;
+      }
+
+      textarea {
+        min-height: 310px;
+        resize: vertical;
+        line-height: 1.6;
+      }
+
+      button {
+        font-family: var(--sans);
+      }
+
+      .send-btn {
+        border: 0;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-2));
+        color: #052e16;
+        font-weight: 900;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .send-btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.06);
+      }
+
+      .send-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 430px 1fr;
+        min-height: 690px;
+      }
+
+      .left {
+        border-right: 1px solid var(--border);
+        background: rgba(2, 6, 23, 0.28);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 4px;
+        padding: 12px 12px 0;
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+      }
+
+      .tab {
+        border: 0;
+        background: transparent;
+        color: var(--muted-2);
+        padding: 11px 10px;
+        font-weight: 800;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+      }
+
+      .tab.active {
+        color: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .pane {
+        display: none;
+        padding: 16px;
+      }
+
+      .pane.active {
+        display: block;
+      }
+
+      .label {
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 7px;
+        display: block;
+      }
+
+      .hint {
+        color: var(--muted-2);
+        font-size: 0.8rem;
+        line-height: 1.55;
+        margin-top: 8px;
+      }
+
+      .btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 12px;
+      }
+
+      .mini-btn {
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.86);
+        color: var(--text);
+        padding: 9px 11px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .mini-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      .mini-btn.danger:hover {
+        border-color: var(--red);
+        color: var(--red);
+      }
+
+      .mini-btn.blue:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+
+      .kv-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .kv-table th {
+        color: var(--muted-2);
+        font-size: 0.7rem;
+        text-align: left;
+        padding: 7px;
+        text-transform: uppercase;
+      }
+
+      .kv-table td {
+        padding: 6px;
+      }
+
+      .kv-table input {
+        padding: 9px;
+        font-size: 0.75rem;
+      }
+
+      .kv-del {
+        width: 34px;
+        border: 1px solid var(--border);
+        background: #020617;
+        color: var(--muted);
+        border-radius: 9px;
+        cursor: pointer;
+        padding: 9px 0;
+      }
+
+      .kv-del:hover {
+        color: var(--red);
+        border-color: var(--red);
+      }
+
+      .preset-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .preset {
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.62);
+        border-radius: 14px;
+        padding: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .preset:hover {
+        border-color: var(--primary);
+        background: rgba(163, 230, 53, 0.05);
+      }
+
+      .preset strong {
+        font-size: 0.86rem;
+      }
+
+      .preset code {
+        display: block;
+        color: var(--muted-2);
+        margin-top: 6px;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        word-break: break-all;
+      }
+
+      .method-get {
+        color: var(--primary);
+        font-family: var(--mono);
+        font-weight: 900;
+      }
+      .method-post {
+        color: var(--amber);
+        font-family: var(--mono);
+        font-weight: 900;
+      }
+      .method-put {
+        color: var(--blue);
+        font-family: var(--mono);
+        font-weight: 900;
+      }
+      .method-delete {
+        color: var(--red);
+        font-family: var(--mono);
+        font-weight: 900;
+      }
+
+      .response-head {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        background: rgba(15, 23, 42, 0.48);
+      }
+
+      .response-title {
+        font-weight: 900;
+        color: var(--primary);
+      }
+
+      .metrics {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .metric {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 5px 9px;
+        background: #020617;
+      }
+
+      .metric b {
+        color: var(--text);
+      }
+
+      .response-body {
+        padding: 16px;
+      }
+
+      pre {
+        min-height: 610px;
+        max-height: 760px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        background: #020617;
+        border-radius: 14px;
+        padding: 16px;
+        color: #cbd5e1;
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .empty {
+        min-height: 610px;
+        border: 1px dashed var(--border);
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        color: var(--muted-2);
+        line-height: 1.7;
+        padding: 24px;
+      }
+
+      .json-key {
+        color: #7dd3fc;
+      }
+      .json-string {
+        color: #86efac;
+      }
+      .json-number {
+        color: #fbbf24;
+      }
+      .json-bool {
+        color: #fb7185;
+      }
+
+      .docs-sidebar {
+        position: sticky;
+        top: 24px;
+      }
+
+      .docs-card {
+        padding: 18px;
+        max-height: calc(100vh - 56px);
+        overflow: auto;
+      }
+
+      .docs-header {
+        margin-bottom: 14px;
+      }
+
+      .docs-header h2 {
+        color: var(--primary);
+        font-size: 1.05rem;
+        font-weight: 900;
+        margin-bottom: 5px;
+      }
+
+      .docs-header p {
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.55;
+      }
+
+      .docs-section {
+        border-top: 1px solid var(--border);
+        padding-top: 14px;
+        margin-top: 14px;
+      }
+
+      .docs-section h3 {
+        font-size: 0.85rem;
+        color: var(--text);
+        margin-bottom: 7px;
+      }
+
+      .docs-section p,
+      .docs-section li {
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.55;
+      }
+
+      .docs-section ul {
+        padding-left: 18px;
+        display: grid;
+        gap: 5px;
+      }
+
+      .docs-section code {
+        display: block;
+        margin-top: 8px;
+        padding: 9px;
+        border-radius: 10px;
+        background: #020617;
+        color: var(--primary);
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        word-break: break-all;
+        line-height: 1.5;
+      }
+
+      .docs-chip {
+        display: inline-flex;
+        width: fit-content;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.7);
+        font-size: 0.7rem;
+        font-weight: 900;
+        font-family: var(--mono);
+        margin-bottom: 6px;
+      }
+
+
+      .mode-info {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.58);
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.55;
+      }
+
+      .body-section {
+        display: none;
+      }
+
+      .body-section.active {
+        display: block;
+      }
+
+      .file-input {
+        font-family: var(--sans);
+        font-size: 0.74rem;
+        padding: 8px;
+      }
+
+      .form-type {
+        min-width: 88px;
+        padding: 9px;
+        font-size: 0.75rem;
+      }
+
+      .footer-note {
+        color: var(--muted-2);
+        font-size: 0.78rem;
+        margin-top: 14px;
+        line-height: 1.6;
+      }
+
+      .toast {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        background: rgba(2, 6, 23, 0.96);
+        color: var(--primary);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px 14px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        transform: translateY(12px);
+        pointer-events: none;
+        transition: 0.25s;
+        z-index: 1000;
+        font-weight: 800;
+        font-size: 0.85rem;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 1250px) {
+        .main-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .docs-sidebar {
+          position: static;
+        }
+
+        .docs-card {
+          max-height: none;
+        }
+      }
+
+      @media (max-width: 1000px) {
+        .request-bar,
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .left {
+          border-right: 0;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .topbar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .endpoint-badge {
+          width: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-icon">API</div>
+          <div>
+            <h1>MiniPostman Lab</h1>
+            <p>
+              Standalone REST client untuk menguji endpoint API secara cepat.
+            </p>
+          </div>
+        </div>
+
+        <div class="endpoint-badge" id="active-endpoint">
+          Masukkan endpoint API di kolom URL
+        </div>
+      </header>
+
+      <div class="main-shell">
+        <section class="card">
+          <div class="request-bar">
+            <select id="method" onchange="syncMethodColor()">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+
+            <input
+              id="url"
+              value=""
+              placeholder="Masukkan endpoint API, contoh: /data_warehouse/backend/alumni.php"
+              spellcheck="false"
+            />
+
+            <button id="send-btn" class="send-btn" onclick="sendRequest()">
+              Send
+            </button>
+          </div>
+
+          <div class="grid">
+            <aside class="left">
+              <div class="tabs">
+                <button class="tab active" onclick="switchPane('auth', this)">
+                  Auth
+                </button>
+                <button class="tab" onclick="switchPane('params', this)">
+                  Params
+                </button>
+                <button class="tab" onclick="switchPane('headers', this)">
+                  Headers
+                </button>
+                <button class="tab" onclick="switchPane('body', this)">
+                  Body
+                </button>
+                <button class="tab" onclick="switchPane('presets', this)">
+                  Presets
+                </button>
+                <button class="tab" onclick="switchPane('history', this)">
+                  History
+                </button>
+              </div>
+
+              <div id="pane-auth" class="pane active">
+                <label class="label">Auth Type</label>
+                <select id="auth-type">
+                  <option value="x-api-key" selected>X-API-KEY</option>
+                  <option value="bearer">Bearer Token</option>
+                  <option value="none">No Auth</option>
+                </select>
+
+                <div style="height: 14px"></div>
+
+                <label class="label">API Key / Token</label>
+                <input
+                  id="api-token"
+                  placeholder="Paste API key/token di sini"
+                  spellcheck="false"
+                />
+
+                <p class="hint">
+                  Pilih <b>X-API-KEY</b> jika API menggunakan header
+                  <code>X-API-KEY</code>. Bisa juga ambil otomatis dari key
+                  login di <code>localStorage.api_key</code>.
+                </p>
+
+                <div class="btn-row">
+                  <button class="mini-btn" onclick="copyToken()">Copy</button>
+                  <button class="mini-btn danger" onclick="clearToken()">
+                    Clear
+                  </button>
+                </div>
+              </div>
+
+              <div id="pane-params" class="pane">
+                <p class="hint" style="margin-bottom: 12px">
+                  Params langsung aktif otomatis. Isi key/value, lalu klik <b>Send</b> tanpa perlu tombol lain. Contoh:
+                  key <b>resource</b>, value <b>alumni</b>.
+                </p>
+
+                <table class="kv-table">
+                  <thead>
+                    <tr>
+                      <th>On</th>
+                      <th>Key</th>
+                      <th>Value</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="params-body"></tbody>
+                </table>
+
+                <div class="btn-row">
+                  <button class="mini-btn" onclick="addRow('params-body')">
+                    Tambah Param
+                  </button>
+                  <button class="mini-btn blue" onclick="applyParams()">
+                    Preview URL
+                  </button>
+                  <button class="mini-btn" onclick="syncParamsFromUrl()">
+                    Ambil dari URL
+                  </button>
+                  <button
+                    class="mini-btn danger"
+                    onclick="clearRows('params-body')"
+                  >
+                    Clear Params
+                  </button>
+                </div>
+
+                <div class="btn-row">
+                  <button class="mini-btn" onclick="useParamPreset('alumni')">
+                    Alumni
+                  </button>
+                  <button
+                    class="mini-btn"
+                    onclick="useParamPreset('alumni_filter')"
+                  >
+                    Filter Alumni
+                  </button>
+                  <button
+                    class="mini-btn"
+                    onclick="useParamPreset('alumni_detail')"
+                  >
+                    Detail ID
+                  </button>
+                  <button
+                    class="mini-btn"
+                    onclick="useParamPreset('dashboard')"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    class="mini-btn"
+                    onclick="useParamPreset('serapan_summary')"
+                  >
+                    Serapan
+                  </button>
+                  <button
+                    class="mini-btn"
+                    onclick="useParamPreset('dimensi_prodi')"
+                  >
+                    Dimensi
+                  </button>
+                  <button
+                    class="mini-btn"
+                    onclick="useParamPreset('import_excel')"
+                  >
+                    Import Excel
+                  </button>
+                </div>
+              </div>
+
+              <div id="pane-headers" class="pane">
+                <table class="kv-table">
+                  <thead>
+                    <tr>
+                      <th>On</th>
+                      <th>Key</th>
+                      <th>Value</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="headers-body"></tbody>
+                </table>
+
+                <div class="btn-row">
+                  <button class="mini-btn" onclick="addRow('headers-body')">
+                    Tambah Header
+                  </button>
+                  <button class="mini-btn" onclick="setDefaultHeaders()">
+                    Default Headers
+                  </button>
+                  <button
+                    class="mini-btn danger"
+                    onclick="clearRows('headers-body')"
+                  >
+                    Clear Headers
+                  </button>
+                </div>
+              </div>
+
+              <div id="pane-body" class="pane">
+                <label class="label">Body Mode</label>
+                <select id="body-mode" onchange="syncBodyMode()">
+                  <option value="none">none</option>
+                  <option value="raw" selected>raw JSON</option>
+                  <option value="form-data">form-data / upload file</option>
+                </select>
+
+                <div id="raw-body-section" class="body-section active">
+                  <div class="btn-row">
+                    <button class="mini-btn" onclick="setBodyPreset('create')">
+                      Body Tambah
+                    </button>
+                    <button class="mini-btn" onclick="setBodyPreset('update')">
+                      Body Update
+                    </button>
+                    <button class="mini-btn" onclick="formatBodyJson()">
+                      Format JSON
+                    </button>
+                    <button class="mini-btn danger" onclick="clearBody()">
+                      Clear Body
+                    </button>
+                  </div>
+
+                  <div style="height: 12px"></div>
+
+                  <textarea id="request-body" spellcheck="false"></textarea>
+                </div>
+
+                <div id="form-data-section" class="body-section">
+                  <p class="mode-info">
+                    Mode ini dipakai untuk upload file Excel/CSV. Untuk endpoint import,
+                    gunakan <b>POST</b>, Params <b>resource=alumni</b> dan
+                    <b>action=import_excel</b>, lalu isi key <b>file</b> dengan tipe File.
+                  </p>
+
+                  <table class="kv-table">
+                    <thead>
+                      <tr>
+                        <th>On</th>
+                        <th>Key</th>
+                        <th>Type</th>
+                        <th>Value</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="form-data-body"></tbody>
+                  </table>
+
+                  <div class="btn-row">
+                    <button class="mini-btn" onclick="addFormDataRow()">
+                      Tambah Field
+                    </button>
+                    <button class="mini-btn blue" onclick="setImportExcelPreset()">
+                      Preset Import Excel
+                    </button>
+                    <button class="mini-btn danger" onclick="clearFormDataRows()">
+                      Clear Form Data
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="pane-presets" class="pane">
+                <div class="preset-list" id="preset-list"></div>
+              </div>
+
+              <div id="pane-history" class="pane">
+                <div class="btn-row" style="margin-top: 0; margin-bottom: 12px">
+                  <button class="mini-btn danger" onclick="clearHistory()">
+                    Clear History
+                  </button>
+                </div>
+                <div class="preset-list" id="history-list"></div>
+              </div>
+            </aside>
+
+            <main>
+              <div class="response-head">
+                <div class="response-title">Response</div>
+                <div class="metrics" id="metrics">
+                  <span class="metric">Status: <b>-</b></span>
+                  <span class="metric">Time: <b>-</b></span>
+                  <span class="metric">Size: <b>-</b></span>
+                </div>
+              </div>
+
+              <div class="response-body">
+                <div class="btn-row" style="margin-top: 0; margin-bottom: 12px">
+                  <button class="mini-btn" onclick="copyResponse()">
+                    Copy Response
+                  </button>
+                  <button class="mini-btn" onclick="downloadResponse()">
+                    Download JSON
+                  </button>
+                  <button class="mini-btn danger" onclick="clearResponse()">
+                    Clear Response
+                  </button>
+                </div>
+
+                <div id="empty-response" class="empty">
+                  <div>
+                    <b>Belum ada response.</b><br />
+                    Masukkan endpoint API, atur auth/body jika diperlukan, lalu
+                    klik <b>Send</b>.
+                  </div>
+                </div>
+                <pre id="response" style="display: none"></pre>
+              </div>
+            </main>
+          </div>
+        </section>
+
+        <aside class="docs-sidebar">
+          <div class="docs-card">
+            <div class="docs-header">
+              <h2>📘 Dokumentasi API Alumni</h2>
+              <p>
+                Dokumentasi penggunaan API Data Warehouse Serapan Kerja Alumni.
+                Endpoint utama yang digunakan:
+              </p>
+              <code>/data_warehouse/backend/alumni.php</code>
+            </div>
+
+            <div class="docs-section">
+              <h3>1. Alur Penggunaan Cepat</h3>
+              <ul>
+                <li>Login terlebih dahulu untuk mendapatkan <b>api_key</b>.</li>
+                <li>Copy nilai <b>api_key</b> dari response login.</li>
+                <li>Buka tab <b>Auth</b>, pilih <b>X-API-KEY</b>.</li>
+                <li>Paste API key, lalu uji endpoint data.</li>
+              </ul>
+            </div>
+
+            <div class="docs-section">
+              <h3>2. Auth Header</h3>
+              <p>
+                Endpoint data seperti alumni, dashboard, charts, serapan, dan
+                dimensi wajib memakai API key.
+              </p>
+              <code>X-API-KEY: api_key_dari_login</code>
+            </div>
+
+            <div class="docs-section">
+              <h3>3. Register User</h3>
+              <span class="docs-chip method-post">POST</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=auth&action=register</code
+              >
+              <code>{ "username": "admin", "password": "admin123" }</code>
+            </div>
+
+            <div class="docs-section">
+              <h3>4. Login & Ambil API Key</h3>
+              <span class="docs-chip method-post">POST</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=auth&action=login</code
+              >
+              <code>{ "username": "admin", "password": "admin123" }</code>
+              <p>
+                Jika berhasil, response akan mengembalikan data user dan
+                <b>api_key</b>. API key itulah yang dipakai pada tab Auth.
+              </p>
+            </div>
+
+            <div class="docs-section">
+              <h3>5. Validasi API Key</h3>
+              <span class="docs-chip method-post">POST</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=auth&action=validate</code
+              >
+              <p>
+                Gunakan endpoint ini untuk mengecek apakah API key masih valid.
+              </p>
+            </div>
+
+            <div class="docs-section">
+              <h3>6. Regenerate API Key</h3>
+              <span class="docs-chip method-post">POST</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=auth&action=regenerate_key</code
+              >
+              <p>Membuat API key baru. API key lama otomatis tidak berlaku.</p>
+            </div>
+
+            <div class="docs-section">
+              <h3>7. Logout</h3>
+              <span class="docs-chip method-post">POST</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=auth&action=logout</code
+              >
+              <p>Menghapus API key dari user yang sedang aktif.</p>
+            </div>
+
+            <div class="docs-section">
+              <h3>8. Ambil Data Alumni</h3>
+              <span class="docs-chip method-get">GET</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=alumni&page=1&limit=10</code
+              >
+              <p>
+                Endpoint ini mengambil data alumni dengan pagination. Maksimal
+                limit adalah <b>100</b> data per halaman.
+              </p>
+              <ul>
+                <li><b>page</b>: nomor halaman.</li>
+                <li><b>limit</b>: jumlah data per halaman.</li>
+                <li><b>tahun</b>: filter tahun lulus.</li>
+                <li><b>prodi</b>: filter prodi, contoh TKJ/TMJ.</li>
+                <li><b>status</b>: filter status kerja.</li>
+              </ul>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=alumni&page=1&limit=100&prodi=TKJ&tahun=2024</code
+              >
+            </div>
+
+            <div class="docs-section">
+              <h3>9. Detail Alumni by ID Fact</h3>
+              <span class="docs-chip method-get">GET</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=alumni&id_fact=1</code
+              >
+              <p>
+                Digunakan untuk mengambil satu data alumni. Cocok untuk fitur
+                cari data sebelum edit.
+              </p>
+            </div>
+
+            <div class="docs-section">
+              <h3>10. Tambah Data Alumni</h3>
+              <span class="docs-chip method-post">POST</span>
+              <code>/data_warehouse/backend/alumni.php?resource=alumni</code>
+              <p>
+                Gunakan body mode <b>raw JSON</b>. Field wajib: kode responden,
+                tahun lulus, prodi, jenjang, status kerja, kategori instansi,
+                range pendapatan, lama tunggu, dan kota.
+              </p>
+            </div>
+
+            <div class="docs-section">
+              <h3>11. Update Data Alumni</h3>
+              <span class="docs-chip method-put">PUT</span>
+              <code>/data_warehouse/backend/alumni.php?resource=alumni</code>
+              <p>
+                Untuk update, field <b>id_fact</b> wajib dikirim di body JSON.
+              </p>
+            </div>
+
+            <div class="docs-section">
+              <h3>12. Import Excel ETL</h3>
+              <span class="docs-chip method-post">POST</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=alumni&action=import_excel</code
+              >
+              <p>
+                Endpoint ini menggunakan upload file Excel/CSV dengan
+                <b>form-data</b> key <b>file</b>. Di MiniPostman ini sudah
+                tersedia Body Mode <b>form-data / upload file</b> untuk mengetes
+                import langsung dari halaman ini.
+              </p>
+            </div>
+
+            <div class="docs-section">
+              <h3>13. Dashboard & Charts</h3>
+              <span class="docs-chip method-get">GET</span>
+              <code>/data_warehouse/backend/alumni.php?resource=dashboard</code>
+              <code>/data_warehouse/backend/alumni.php?resource=charts</code>
+            </div>
+
+            <div class="docs-section">
+              <h3>14. Serapan Kerja</h3>
+              <span class="docs-chip method-get">GET</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=serapan&action=summary</code
+              >
+              <code
+                >/data_warehouse/backend/alumni.php?resource=serapan&action=prodi</code
+              >
+              <code
+                >/data_warehouse/backend/alumni.php?resource=serapan&action=tahun</code
+              >
+            </div>
+
+            <div class="docs-section">
+              <h3>15. Data Dimensi</h3>
+              <span class="docs-chip method-get">GET</span>
+              <code
+                >/data_warehouse/backend/alumni.php?resource=dimensi&name=prodi</code
+              >
+              <code
+                >/data_warehouse/backend/alumni.php?resource=dimensi&name=tahun</code
+              >
+              <code
+                >/data_warehouse/backend/alumni.php?resource=dimensi&name=status</code
+              >
+              <code
+                >/data_warehouse/backend/alumni.php?resource=dimensi&name=kota</code
+              >
+              <code
+                >/data_warehouse/backend/alumni.php?resource=dimensi&name=instansi</code
+              >
+              <code
+                >/data_warehouse/backend/alumni.php?resource=dimensi&name=pendapatan</code
+              >
+            </div>
+
+            <div class="docs-section">
+              <h3>16. Error Umum</h3>
+              <ul>
+                <li>
+                  <b>400</b>: request/body tidak lengkap atau format salah.
+                </li>
+                <li>
+                  <b>401</b>: API key kosong, salah, atau sudah tidak valid.
+                </li>
+                <li><b>404</b>: resource atau data tidak ditemukan.</li>
+                <li><b>405</b>: method tidak didukung oleh endpoint.</li>
+                <li><b>409</b>: data sudah ada atau duplikat.</li>
+                <li><b>500</b>: error server/database.</li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const TOKEN_STORAGE_KEY = "minipostman_api_key";
+      const HISTORY_STORAGE_KEY = "minipostman_history";
+      const API_BASE = "/data_warehouse/backend/alumni.php";
+      let latestResponseText = "";
+
+      const PARAM_PRESETS = {
+        alumni: [
+          ["resource", "alumni"],
+          ["page", "1"],
+          ["limit", "5"],
+        ],
+        alumni_filter: [
+          ["resource", "alumni"],
+          ["page", "1"],
+          ["limit", "100"],
+          ["prodi", "TKJ"],
+          ["tahun", "2024"],
+          ["status", "Bekerja"],
+        ],
+        alumni_detail: [
+          ["resource", "alumni"],
+          ["id_fact", "1"],
+        ],
+        dashboard: [["resource", "dashboard"]],
+        charts: [["resource", "charts"]],
+        serapan_summary: [
+          ["resource", "serapan"],
+          ["action", "summary"],
+        ],
+        serapan_prodi: [
+          ["resource", "serapan"],
+          ["action", "prodi"],
+        ],
+        serapan_tahun: [
+          ["resource", "serapan"],
+          ["action", "tahun"],
+        ],
+        dimensi_prodi: [
+          ["resource", "dimensi"],
+          ["name", "prodi"],
+        ],
+        dimensi_status: [
+          ["resource", "dimensi"],
+          ["name", "status"],
+        ],
+        dimensi_tahun: [
+          ["resource", "dimensi"],
+          ["name", "tahun"],
+        ],
+        dimensi_kota: [
+          ["resource", "dimensi"],
+          ["name", "kota"],
+        ],
+        dimensi_instansi: [
+          ["resource", "dimensi"],
+          ["name", "instansi"],
+        ],
+        dimensi_pendapatan: [
+          ["resource", "dimensi"],
+          ["name", "pendapatan"],
+        ],
+        import_excel: [
+          ["resource", "alumni"],
+          ["action", "import_excel"],
+        ],
+      };
+
+      const BODY_PRESETS = {
+        create: {
+          kode_responden_asli: "R-001",
+          tahun_lulus: "2024",
+          nama_prodi: "TKJ",
+          jenjang: "D4",
+          jurusan: "Teknik Informatika dan Komputer",
+          status_kerja: "Bekerja",
+          jenis_pekerjaan: "Programmer",
+          kategori_instansi: "Perusahaan IT/Teknologi",
+          jenis_lembaga: "Swasta",
+          range_pendapatan: "Rp 3-5 Juta",
+          lama_tunggu_bulan: 2,
+          nama_kota: "Makassar",
+        },
+        update: {
+          id_fact: 1,
+          kode_responden_asli: "R-001",
+          tahun_lulus: "2024",
+          nama_prodi: "TKJ",
+          jenjang: "D4",
+          jurusan: "Teknik Informatika dan Komputer",
+          status_kerja: "Bekerja",
+          jenis_pekerjaan: "Network Engineer",
+          kategori_instansi: "Perusahaan IT/Teknologi",
+          jenis_lembaga: "Swasta",
+          range_pendapatan: "Rp 3-5 Juta",
+          lama_tunggu_bulan: 3,
+          nama_kota: "Makassar",
+        },
+      };
+
+      const PRESETS = [
+        {
+          title: "Ambil Data Alumni",
+          method: "GET",
+          url: API_BASE,
+          paramPreset: "alumni",
+          bodyMode: "none",
+        },
+        {
+          title: "Filter Alumni TKJ 2024",
+          method: "GET",
+          url: API_BASE,
+          paramPreset: "alumni_filter",
+          bodyMode: "none",
+        },
+        {
+          title: "Detail Alumni by ID Fact",
+          method: "GET",
+          url: API_BASE,
+          paramPreset: "alumni_detail",
+          bodyMode: "none",
+        },
+        {
+          title: "Dashboard Data",
+          method: "GET",
+          url: API_BASE,
+          paramPreset: "dashboard",
+          bodyMode: "none",
+        },
+        {
+          title: "Summary Serapan",
+          method: "GET",
+          url: API_BASE,
+          paramPreset: "serapan_summary",
+          bodyMode: "none",
+        },
+        {
+          title: "Serapan per Prodi",
+          method: "GET",
+          url: API_BASE,
+          paramPreset: "serapan_prodi",
+          bodyMode: "none",
+        },
+        {
+          title: "Serapan per Tahun",
+          method: "GET",
+          url: API_BASE,
+          paramPreset: "serapan_tahun",
+          bodyMode: "none",
+        },
+        {
+          title: "Dimensi Prodi",
+          method: "GET",
+          url: API_BASE,
+          paramPreset: "dimensi_prodi",
+          bodyMode: "none",
+        },
+        {
+          title: "Tambah Alumni",
+          method: "POST",
+          url: API_BASE,
+          paramPreset: "alumni",
+          bodyMode: "raw",
+          bodyPreset: "create",
+        },
+        {
+          title: "Update Alumni",
+          method: "PUT",
+          url: API_BASE,
+          paramPreset: "alumni",
+          bodyMode: "raw",
+          bodyPreset: "update",
+        },
+        {
+          title: "Import Excel ETL",
+          method: "POST",
+          url: API_BASE,
+          paramPreset: "import_excel",
+          bodyMode: "form-data",
+          formDataPreset: "import_excel",
+        },
+      ];
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2200);
+      }
+
+      function openMainApp() {
+        window.location.href = "dashboard.html";
+      }
+
+      function switchPane(name, btn) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((el) => el.classList.remove("active"));
+
+        document
+          .querySelectorAll(".pane")
+          .forEach((el) => el.classList.remove("active"));
+
+        btn.classList.add("active");
+        document.getElementById(`pane-${name}`).classList.add("active");
+      }
+
+      function syncMethodColor() {
+        const method = document.getElementById("method");
+        const colors = {
+          GET: "#a3e635",
+          POST: "#fbbf24",
+          PUT: "#38bdf8",
+          DELETE: "#fb7185",
+        };
+
+        method.style.color = colors[method.value] || "#e5e7eb";
+      }
+
+      function updateActiveEndpoint() {
+        const endpoint = buildUrlWithParams(false);
+        document.getElementById("active-endpoint").textContent =
+          endpoint || "Masukkan endpoint API di kolom URL";
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function escapeAttr(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function addRow(tbodyId, key = "", value = "") {
+        const tbody = document.getElementById(tbodyId);
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td><input type="checkbox" checked /></td>
+          <td><input placeholder="Key" value="${escapeAttr(key)}" /></td>
+          <td><input placeholder="Value" value="${escapeAttr(value)}" /></td>
+          <td><button class="kv-del" onclick="deleteRow(this)">×</button></td>
+        `;
+
+        tbody.appendChild(tr);
+      }
+
+      function deleteRow(button) {
+        button.closest("tr")?.remove();
+      }
+
+      function clearRows(tbodyId) {
+        document.getElementById(tbodyId).innerHTML = "";
+      }
+
+      function setRows(tbodyId, rows) {
+        clearRows(tbodyId);
+        rows.forEach(([key, value]) => addRow(tbodyId, key, value));
+      }
+
+      function getRows(tbodyId) {
+        return [...document.querySelectorAll(`#${tbodyId} tr`)]
+          .map((row) => {
+            const inputs = row.querySelectorAll("input");
+
+            return {
+              checked: inputs[0]?.checked,
+              key: inputs[1]?.value.trim(),
+              value: inputs[2]?.value.trim(),
+            };
+          })
+          .filter((row) => row.checked && row.key);
+      }
+
+      function setDefaultHeaders() {
+        setRows("headers-body", [["Content-Type", "application/json"]]);
+      }
+
+      function normalizeBaseUrl(rawUrl) {
+        if (!rawUrl) return "";
+        return rawUrl.split("?")[0];
+      }
+
+      function buildUrlWithParams(useExistingQuery = true) {
+        const rawUrl = document.getElementById("url").value.trim();
+
+        if (!rawUrl) return "";
+
+        const base = normalizeBaseUrl(rawUrl);
+        const params = new URLSearchParams();
+
+        if (useExistingQuery && rawUrl.includes("?")) {
+          const existingQuery = rawUrl.split("?").slice(1).join("?");
+          const existingParams = new URLSearchParams(existingQuery);
+
+          existingParams.forEach((value, key) => {
+            params.set(key, value);
+          });
+        }
+
+        getRows("params-body").forEach((row) => {
+          params.set(row.key, row.value || "");
+        });
+
+        return params.toString() ? `${base}?${params.toString()}` : base;
+      }
+
+      function applyParams() {
+        const finalUrl = buildUrlWithParams(true);
+
+        if (!finalUrl) {
+          alert("Isi endpoint URL terlebih dahulu.");
+          return;
+        }
+
+        document.getElementById("url").value = finalUrl;
+        updateActiveEndpoint();
+        showToast("✅ Params diterapkan ke URL.");
+      }
+
+      function syncParamsFromUrl() {
+        const rawUrl = document.getElementById("url").value.trim();
+
+        if (!rawUrl.includes("?")) {
+          showToast("URL belum punya query params.");
+          return;
+        }
+
+        const query = rawUrl.split("?").slice(1).join("?");
+        const params = new URLSearchParams(query);
+        const rows = [];
+
+        params.forEach((value, key) => {
+          rows.push([key, value]);
+        });
+
+        if (rows.length > 0) {
+          setRows("params-body", rows);
+          showToast("✅ Params diambil dari URL.");
+        }
+      }
+
+      function useParamPreset(name) {
+        if (!PARAM_PRESETS[name]) return;
+
+        setRows("params-body", PARAM_PRESETS[name]);
+        document.getElementById("url").value = API_BASE;
+        applyParams();
+      }
+
+      function setBodyPreset(type) {
+        if (!BODY_PRESETS[type]) return;
+
+        document.getElementById("body-mode").value = "raw";
+        document.getElementById("request-body").value = JSON.stringify(
+          BODY_PRESETS[type],
+          null,
+          2,
+        );
+        showToast("✅ Body preset digunakan.");
+      }
+
+      function formatBodyJson() {
+        const textarea = document.getElementById("request-body");
+        const value = textarea.value.trim();
+
+        if (!value) {
+          showToast("Body kosong.");
+          return;
+        }
+
+        try {
+          textarea.value = JSON.stringify(JSON.parse(value), null, 2);
+          showToast("✅ JSON berhasil dirapikan.");
+        } catch (error) {
+          alert("Body bukan JSON valid: " + error.message);
+        }
+      }
+
+      function clearBody() {
+        document.getElementById("request-body").value = "";
+      }
+
+      function syncBodyMode() {
+        const mode = document.getElementById("body-mode").value;
+        const rawSection = document.getElementById("raw-body-section");
+        const formDataSection = document.getElementById("form-data-section");
+
+        rawSection.classList.toggle("active", mode === "raw");
+        formDataSection.classList.toggle("active", mode === "form-data");
+
+        if (mode === "form-data") {
+          const headers = getRows("headers-body");
+          const filteredHeaders = headers.filter(
+            (row) => row.key.toLowerCase() !== "content-type",
+          );
+          setRows(
+            "headers-body",
+            filteredHeaders.map((row) => [row.key, row.value]),
+          );
+        }
+      }
+
+      function addFormDataRow(key = "", type = "text", value = "") {
+        const tbody = document.getElementById("form-data-body");
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td><input type="checkbox" checked /></td>
+          <td><input placeholder="Key" value="${escapeAttr(key)}" /></td>
+          <td>
+            <select class="form-type" onchange="toggleFormDataInput(this)">
+              <option value="text" ${type === "text" ? "selected" : ""}>Text</option>
+              <option value="file" ${type === "file" ? "selected" : ""}>File</option>
+            </select>
+          </td>
+          <td class="form-value-cell"></td>
+          <td><button class="kv-del" onclick="deleteRow(this)">×</button></td>
+        `;
+
+        tbody.appendChild(tr);
+        const select = tr.querySelector(".form-type");
+        toggleFormDataInput(select, value);
+      }
+
+      function toggleFormDataInput(select, value = "") {
+        const row = select.closest("tr");
+        const cell = row.querySelector(".form-value-cell");
+
+        if (select.value === "file") {
+          cell.innerHTML = `<input class="file-input" type="file" />`;
+          return;
+        }
+
+        cell.innerHTML = `<input placeholder="Value" value="${escapeAttr(value)}" />`;
+      }
+
+      function clearFormDataRows() {
+        document.getElementById("form-data-body").innerHTML = "";
+      }
+
+      function setImportExcelPreset() {
+        document.getElementById("method").value = "POST";
+        document.getElementById("url").value = API_BASE;
+        document.getElementById("body-mode").value = "form-data";
+        setRows("params-body", PARAM_PRESETS.import_excel);
+        clearFormDataRows();
+        addFormDataRow("file", "file");
+        syncMethodColor();
+        syncBodyMode();
+        applyParams();
+        showToast("✅ Preset import Excel aktif. Pilih file di form-data.");
+      }
+
+      function getFormDataRows() {
+        return [...document.querySelectorAll("#form-data-body tr")]
+          .map((row) => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            const keyInput = row.querySelector('td:nth-child(2) input');
+            const typeSelect = row.querySelector(".form-type");
+            const valueCell = row.querySelector(".form-value-cell");
+            const textInput = valueCell?.querySelector('input[type="text"], input:not([type])');
+            const fileInput = valueCell?.querySelector('input[type="file"]');
+
+            return {
+              checked: checkbox?.checked,
+              key: keyInput?.value.trim(),
+              type: typeSelect?.value || "text",
+              value: textInput?.value || "",
+              file: fileInput?.files?.[0] || null,
+            };
+          })
+          .filter((row) => row.checked && row.key);
+      }
+
+      function buildFormDataBody() {
+        const formData = new FormData();
+        const rows = getFormDataRows();
+
+        rows.forEach((row) => {
+          if (row.type === "file") {
+            if (row.file) {
+              formData.append(row.key, row.file);
+            }
+            return;
+          }
+
+          formData.append(row.key, row.value);
+        });
+
+        return formData;
+      }
+
+      function usePreset(index) {
+        const preset = PRESETS[index];
+
+        if (!preset) return;
+
+        document.getElementById("method").value = preset.method;
+        document.getElementById("url").value = preset.url;
+        document.getElementById("body-mode").value = preset.bodyMode || "none";
+
+        if (preset.paramPreset) {
+          setRows("params-body", PARAM_PRESETS[preset.paramPreset]);
+        } else {
+          clearRows("params-body");
+        }
+
+        if (preset.bodyPreset) {
+          setBodyPreset(preset.bodyPreset);
+        }
+
+        if (preset.formDataPreset === "import_excel") {
+          clearFormDataRows();
+          addFormDataRow("file", "file");
+        }
+
+        syncMethodColor();
+        syncBodyMode();
+        applyParams();
+        showToast("✅ Preset digunakan.");
+      }
+
+      function renderPresets() {
+        const list = document.getElementById("preset-list");
+
+        list.innerHTML = PRESETS.map((preset, index) => {
+          const cls = `method-${preset.method.toLowerCase()}`;
+          const params = preset.paramPreset
+            ? new URLSearchParams(PARAM_PRESETS[preset.paramPreset]).toString()
+            : "";
+          const url = params ? `${preset.url}?${params}` : preset.url;
+
+          return `
+            <div class="preset" onclick="usePreset(${index})">
+              <span class="${cls}">${preset.method}</span>
+              <strong>${escapeHtml(preset.title)}</strong>
+              <code>${escapeHtml(url)}</code>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function saveToken() {
+        const token = document.getElementById("api-token").value.trim();
+        localStorage.setItem(TOKEN_STORAGE_KEY, token);
+        showToast("✅ API key berhasil disimpan.");
+      }
+
+      function loadLoginToken() {
+        const token = localStorage.getItem("api_key") || "";
+        document.getElementById("api-token").value = token;
+
+        if (token) {
+          localStorage.setItem(TOKEN_STORAGE_KEY, token);
+          showToast("✅ API key login digunakan.");
+        } else {
+          showToast("API key login tidak ditemukan.");
+        }
+      }
+
+      function loadToken() {
+        const token =
+          localStorage.getItem(TOKEN_STORAGE_KEY) ||
+          localStorage.getItem("api_key") ||
+          "";
+
+        document.getElementById("api-token").value = token;
+
+        if (token) {
+          showToast("✅ API key dimuat.");
+        }
+      }
+
+      function copyToken() {
+        const token = document.getElementById("api-token").value.trim();
+
+        if (!token) {
+          alert("API key/token kosong.");
+          return;
+        }
+
+        navigator.clipboard.writeText(token);
+        showToast("✅ API key/token berhasil disalin.");
+      }
+
+      function clearToken() {
+        document.getElementById("api-token").value = "";
+        localStorage.removeItem(TOKEN_STORAGE_KEY);
+        showToast("Token dikosongkan.");
+      }
+
+      function highlightJson(value) {
+        return escapeHtml(value).replace(
+          /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\\s*:)?|\\b(true|false|null)\\b|-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?)/g,
+          (match) => {
+            let cls = "json-number";
+
+            if (/^"/.test(match)) {
+              cls = /:$/.test(match) ? "json-key" : "json-string";
+            } else if (/true|false|null/.test(match)) {
+              cls = "json-bool";
+            }
+
+            return `<span class="${cls}">${match}</span>`;
+          },
+        );
+      }
+
+      function showResponse(text) {
+        latestResponseText = text;
+
+        const empty = document.getElementById("empty-response");
+        const pre = document.getElementById("response");
+
+        empty.style.display = "none";
+        pre.style.display = "block";
+
+        try {
+          const json = JSON.parse(text);
+          pre.innerHTML = highlightJson(JSON.stringify(json, null, 2));
+        } catch {
+          pre.textContent = text;
+        }
+      }
+
+      function clearResponse() {
+        latestResponseText = "";
+        document.getElementById("response").style.display = "none";
+        document.getElementById("response").textContent = "";
+        document.getElementById("empty-response").style.display = "grid";
+        document.getElementById("metrics").innerHTML = `
+          <span class="metric">Status: <b>-</b></span>
+          <span class="metric">Time: <b>-</b></span>
+          <span class="metric">Size: <b>-</b></span>
+        `;
+      }
+
+      function copyResponse() {
+        if (!latestResponseText) {
+          showToast("Response kosong.");
+          return;
+        }
+
+        navigator.clipboard.writeText(latestResponseText);
+        showToast("✅ Response berhasil disalin.");
+      }
+
+      function downloadResponse() {
+        if (!latestResponseText) {
+          showToast("Response kosong.");
+          return;
+        }
+
+        const blob = new Blob([latestResponseText], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = "minipostman-response.json";
+        a.click();
+
+        URL.revokeObjectURL(url);
+      }
+
+      function setMetrics(status, statusText, time, size) {
+        document.getElementById("metrics").innerHTML = `
+          <span class="metric">Status: <b>${status} ${statusText}</b></span>
+          <span class="metric">Time: <b>${time} ms</b></span>
+          <span class="metric">Size: <b>${size} B</b></span>
+        `;
+      }
+
+      function saveHistory(method, url, status) {
+        let history = JSON.parse(
+          localStorage.getItem(HISTORY_STORAGE_KEY) || "[]",
+        );
+
+        history.unshift({
+          method,
+          url,
+          status,
+          time: new Date().toLocaleString("id-ID"),
+        });
+
+        history = history.slice(0, 20);
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history));
+        renderHistory();
+      }
+
+      function renderHistory() {
+        const history = JSON.parse(
+          localStorage.getItem(HISTORY_STORAGE_KEY) || "[]",
+        );
+        const list = document.getElementById("history-list");
+
+        if (!history.length) {
+          list.innerHTML = `<p class="hint">Belum ada history request.</p>`;
+          return;
+        }
+
+        list.innerHTML = history.map((item, index) => {
+          return `
+            <div class="preset" onclick="loadHistory(${index})">
+              <span class="method-${item.method.toLowerCase()}">${item.method}</span>
+              <strong>${escapeHtml(String(item.status || "-"))}</strong>
+              <code>${escapeHtml(item.url)}</code>
+              <p class="hint">${escapeHtml(item.time)}</p>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function loadHistory(index) {
+        const history = JSON.parse(
+          localStorage.getItem(HISTORY_STORAGE_KEY) || "[]",
+        );
+        const item = history[index];
+
+        if (!item) return;
+
+        document.getElementById("method").value = item.method;
+        document.getElementById("url").value = item.url;
+
+        syncParamsFromUrl();
+        syncMethodColor();
+        updateActiveEndpoint();
+      }
+
+      function clearHistory() {
+        localStorage.removeItem(HISTORY_STORAGE_KEY);
+        renderHistory();
+        showToast("History berhasil dihapus.");
+      }
+
+      async function sendRequest() {
+        const btn = document.getElementById("send-btn");
+        const method = document.getElementById("method").value;
+        const url = buildUrlWithParams(true);
+        const authType = document.getElementById("auth-type").value;
+        const token = document.getElementById("api-token").value.trim();
+        const bodyMode = document.getElementById("body-mode").value;
+        const rawBody = document.getElementById("request-body").value;
+
+        if (!url) {
+          alert("URL endpoint belum diisi.");
+          return;
+        }
+
+        const headers = {};
+
+        getRows("headers-body").forEach((row) => {
+          headers[row.key] = row.value || "";
+        });
+
+        if (authType === "x-api-key" && token) {
+          headers["X-API-KEY"] = token;
+        }
+
+        if (authType === "bearer" && token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const options = {
+          method,
+          headers,
+        };
+
+        if (!["GET", "HEAD"].includes(method) && bodyMode === "raw") {
+          if (rawBody.trim()) {
+            try {
+              JSON.parse(rawBody);
+              options.body = rawBody;
+            } catch (error) {
+              showResponse(`Invalid JSON body:\n\n${error.message}`);
+              return;
+            }
+          }
+        }
+
+        if (!["GET", "HEAD"].includes(method) && bodyMode === "form-data") {
+          delete headers["Content-Type"];
+          delete headers["content-type"];
+
+          const formRows = getFormDataRows();
+          const missingFile = formRows.some(
+            (row) => row.type === "file" && !row.file,
+          );
+
+          if (missingFile) {
+            showResponse("Form-data belum lengkap:\n\nPilih file terlebih dahulu pada field bertipe File.");
+            return;
+          }
+
+          options.body = buildFormDataBody();
+        }
+
+        try {
+          btn.disabled = true;
+          btn.textContent = "Sending...";
+
+          document.getElementById("url").value = url;
+          updateActiveEndpoint();
+
+          const start = performance.now();
+          const response = await fetch(url, options);
+          const text = await response.text();
+          const end = performance.now();
+          const size = new Blob([text]).size;
+
+          setMetrics(
+            response.status,
+            response.statusText,
+            Math.round(end - start),
+            size,
+          );
+
+          showResponse(text);
+          saveHistory(method, url, `${response.status} ${response.statusText}`);
+        } catch (error) {
+          showResponse(`Request gagal:\n\n${error.message}`);
+          saveHistory(method, url, "FAILED");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Send";
+        }
+      }
+
+
+      function liveApplyParamsToUrl() {
+        const urlInput = document.getElementById("url");
+        const finalUrl = buildUrlWithParams(false);
+
+        if (finalUrl) {
+          urlInput.value = finalUrl;
+          updateActiveEndpoint();
+        }
+      }
+
+      function bindAutoParamExecution() {
+        const paramsBody = document.getElementById("params-body");
+        const headersBody = document.getElementById("headers-body");
+        const urlInput = document.getElementById("url");
+
+        if (paramsBody) {
+          paramsBody.addEventListener("input", () => {
+            liveApplyParamsToUrl();
+          });
+
+          paramsBody.addEventListener("change", () => {
+            liveApplyParamsToUrl();
+          });
+        }
+
+        if (headersBody) {
+          headersBody.addEventListener("input", updateActiveEndpoint);
+          headersBody.addEventListener("change", updateActiveEndpoint);
+        }
+
+        if (urlInput) {
+          urlInput.addEventListener("input", () => {
+            updateActiveEndpoint();
+          });
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        setRows("params-body", PARAM_PRESETS.alumni);
+        setDefaultHeaders();
+        setBodyPreset("create");
+        addFormDataRow("file", "file");
+        syncBodyMode();
+        loadToken();
+        renderPresets();
+        renderHistory();
+        syncMethodColor();
+        bindAutoParamExecution();
+        liveApplyParamsToUrl();
+      });
+    </script>
+  </body>
+</html>
